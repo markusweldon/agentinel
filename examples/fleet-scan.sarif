@@ -1,0 +1,133 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "trident",
+          "informationUri": "https://github.com/markusweldon/trident",
+          "version": "0.1.0",
+          "rules": [
+            {
+              "id": "lethal_trifecta",
+              "name": "LethalTrifecta",
+              "shortDescription": {
+                "text": "Lethal Trifecta / Rule-of-Two violation"
+              },
+              "fullDescription": {
+                "text": "An agent (or its combined toolset) holds all three dangerous capabilities at once: access to untrusted content (A), access to sensitive data or systems (B), and the ability to change state or communicate externally (C). Any prompt injection can then exfiltrate or act. Meta's Rule of Two says hold at most two without a human in the loop."
+              },
+              "helpUri": "https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/",
+              "help": {
+                "text": "Break the trifecta: remove one axis, split capabilities across isolated agents, or require human approval for the state-changing / external-comms step."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "security-severity": "8.0",
+                "tags": [
+                  "security",
+                  "mcp",
+                  "ASI02"
+                ]
+              }
+            },
+            {
+              "id": "secrets_exposure",
+              "name": "SecretsExposure",
+              "shortDescription": {
+                "text": "Secret exposed in server configuration"
+              },
+              "fullDescription": {
+                "text": "An API key, token, or credential is hardcoded into the server's launch command, environment, or arguments where it can leak."
+              },
+              "helpUri": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+              "help": {
+                "text": "Load secrets from a secret manager or runtime environment, never commit them to config, and rotate any exposed credential."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "security-severity": "8.0",
+                "tags": [
+                  "security",
+                  "mcp",
+                  "ASI03"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "lethal_trifecta",
+          "level": "error",
+          "message": {
+            "text": "[ASI02: Tool Misuse and Exploitation] Cross-server lethal trifecta across connected servers \u2014 No single server is a full trifecta, but the connected fleet combines all three axes. A (untrusted-input): web-fetcher; B (sensitive-access): notes-reader; C (external-comms): slack-notifier. An agent connected to all of these can be injected through one server and steered to read sensitive data and exfiltrate it through another."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "mcp-server"
+                }
+              },
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "fleet",
+                  "kind": "resource"
+                }
+              ]
+            }
+          ],
+          "partialFingerprints": {
+            "tridentFinding/v1": "lethal_trifecta:fleet"
+          },
+          "properties": {
+            "asi": "ASI02",
+            "confidence": 0.7,
+            "severity": "high",
+            "evidence": "cross-server A+B+C",
+            "remediation": "Break the trifecta: remove one axis, split capabilities across isolated agents, or require human approval for the state-changing / external-comms step."
+          }
+        },
+        {
+          "ruleId": "secrets_exposure",
+          "level": "error",
+          "message": {
+            "text": "[ASI03: Identity and Privilege Abuse] Secret exposed in server configuration \u2014 Environment variable 'SLACK_TOKEN' in the config holds a hardcoded Slack token."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "mcp-server"
+                }
+              },
+              "logicalLocations": [
+                {
+                  "fullyQualifiedName": "server:slack-notifier",
+                  "kind": "resource"
+                }
+              ]
+            }
+          ],
+          "partialFingerprints": {
+            "tridentFinding/v1": "secrets_exposure:server:slack-notifier"
+          },
+          "properties": {
+            "asi": "ASI03",
+            "confidence": 0.85,
+            "severity": "high",
+            "evidence": "SLACK_TOKEN=xoxb***",
+            "remediation": "Load secrets from a secret manager or runtime environment, never commit them to config, and rotate any exposed credential."
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+from datetime import UTC, datetime
 from pathlib import Path
 
 import typer
@@ -15,7 +16,7 @@ from .prober import probe_http, probe_stdio
 from .report.html import to_html
 from .report.sarif import to_sarif
 from .report.terminal import render_report
-from .scanner import scan_http, scan_stdio
+from .scanner import scan_config, scan_http, scan_stdio
 from .taxonomy import Severity
 
 app = typer.Typer(
@@ -27,6 +28,8 @@ err = Console(stderr=True)
 
 
 def _write_outputs(report, json_out: Path | None, sarif_out: Path | None, html_out: Path | None) -> None:
+    if report.generated_at is None:
+        report.generated_at = datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
     if json_out:
         json_out.write_text(report.model_dump_json(indent=2))
         err.print(f"[dim]wrote JSON report -> {json_out}[/dim]")
@@ -42,6 +45,9 @@ def _write_outputs(report, json_out: Path | None, sarif_out: Path | None, html_o
 def scan(
     stdio: str = typer.Option(None, "--stdio", help="Launch an MCP server with this command and scan it."),
     http: str = typer.Option(None, "--http", help="Connect to a streamable-HTTP MCP server URL and scan it."),
+    config: Path = typer.Option(
+        None, "--config", help="Scan every MCP server in a config file (.mcp.json / Cursor / Claude / VS Code)."
+    ),
     json_out: Path = typer.Option(None, "--json", help="Write the full report as JSON to this path."),
     sarif_out: Path = typer.Option(None, "--sarif", help="Write findings as SARIF (GitHub code scanning)."),
     html_out: Path = typer.Option(None, "--html", help="Write an HTML scorecard to this path."),
@@ -58,15 +64,17 @@ def scan(
     quiet: bool = typer.Option(True, "--quiet/--no-quiet", help="Suppress the scanned server's stderr."),
 ) -> None:
     """Statically scan a single MCP server (static analysis only; no tools are invoked)."""
-    if bool(stdio) == bool(http):
-        err.print("[red]Provide exactly one of --stdio '<command>' or --http <url>.[/red]")
+    if sum(bool(x) for x in (stdio, http, config)) != 1:
+        err.print("[red]Provide exactly one of --stdio '<command>', --http <url>, or --config <path>.[/red]")
         raise typer.Exit(2)
 
     try:
         if stdio:
             report = asyncio.run(scan_stdio(stdio, timeout=timeout, inherit_env=inherit_env, quiet=quiet))
-        else:
+        elif http:
             report = asyncio.run(scan_http(http, timeout=timeout))
+        else:
+            report = asyncio.run(scan_config(str(config), timeout=timeout, quiet=quiet))
     except Exception as exc:  # noqa: BLE001 - surface any connection/enumeration failure cleanly
         err.print(f"[red]Failed to scan target:[/red] {exc}")
         raise typer.Exit(2) from exc

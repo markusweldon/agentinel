@@ -167,6 +167,7 @@ class Report(BaseModel):
     findings: list[Finding] = Field(default_factory=list)
     probe: ProbeReport | None = None
     generated_at: str | None = None
+    notes: list[str] = Field(default_factory=list)
 
     @property
     def severity_counts(self) -> dict[Severity, int]:

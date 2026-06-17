@@ -1,0 +1,172 @@
+{
+  "target": {
+    "transport": "config",
+    "command": "/tmp/fleet-demo-mcp.json",
+    "url": null,
+    "server_name": null
+  },
+  "tools": [
+    {
+      "server": "web-fetcher",
+      "name": "fetch_doc",
+      "description": "Fetch a public documentation page by URL and return its text.",
+      "input_schema": {
+        "properties": {
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "fetch_docArguments",
+        "type": "object"
+      },
+      "annotations": null,
+      "axes": {
+        "untrusted_input": true,
+        "sensitive_access": false,
+        "external_comms": false,
+        "rationale": {
+          "A": "matched: fetch"
+        }
+      }
+    },
+    {
+      "server": "web-fetcher",
+      "name": "search_docs",
+      "description": "Look up a topic in the public documentation index.",
+      "input_schema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "search_docsArguments",
+        "type": "object"
+      },
+      "annotations": null,
+      "axes": {
+        "untrusted_input": false,
+        "sensitive_access": false,
+        "external_comms": false,
+        "rationale": {}
+      }
+    },
+    {
+      "server": "notes-reader",
+      "name": "read_file",
+      "description": "Read a file from the local notes directory.",
+      "input_schema": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "read_fileArguments",
+        "type": "object"
+      },
+      "annotations": null,
+      "axes": {
+        "untrusted_input": false,
+        "sensitive_access": true,
+        "external_comms": false,
+        "rationale": {
+          "B": "matched: read file"
+        }
+      }
+    },
+    {
+      "server": "notes-reader",
+      "name": "list_files",
+      "description": "List the files in the local notes directory.",
+      "input_schema": {
+        "properties": {},
+        "title": "list_filesArguments",
+        "type": "object"
+      },
+      "annotations": null,
+      "axes": {
+        "untrusted_input": false,
+        "sensitive_access": false,
+        "external_comms": false,
+        "rationale": {}
+      }
+    },
+    {
+      "server": "slack-notifier",
+      "name": "send_message",
+      "description": "Send a message to a chat channel.",
+      "input_schema": {
+        "properties": {
+          "channel": {
+            "title": "Channel",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "channel",
+          "text"
+        ],
+        "title": "send_messageArguments",
+        "type": "object"
+      },
+      "annotations": null,
+      "axes": {
+        "untrusted_input": false,
+        "sensitive_access": false,
+        "external_comms": true,
+        "rationale": {
+          "C": "matched: send, send message"
+        }
+      }
+    }
+  ],
+  "findings": [
+    {
+      "attack_class": "secrets_exposure",
+      "asi": "ASI03",
+      "severity": "high",
+      "title": "Secret exposed in server configuration",
+      "detail": "Environment variable 'SLACK_TOKEN' in the config holds a hardcoded Slack token.",
+      "target": "server:slack-notifier",
+      "evidence": "SLACK_TOKEN=xoxb***",
+      "remediation": "Load secrets from a secret manager or runtime environment, never commit them to config, and rotate any exposed credential.",
+      "confidence": 0.85,
+      "references": [
+        "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/"
+      ]
+    },
+    {
+      "attack_class": "lethal_trifecta",
+      "asi": "ASI02",
+      "severity": "high",
+      "title": "Cross-server lethal trifecta across connected servers",
+      "detail": "No single server is a full trifecta, but the connected fleet combines all three axes. A (untrusted-input): web-fetcher; B (sensitive-access): notes-reader; C (external-comms): slack-notifier. An agent connected to all of these can be injected through one server and steered to read sensitive data and exfiltrate it through another.",
+      "target": "fleet",
+      "evidence": "cross-server A+B+C",
+      "remediation": "Break the trifecta: remove one axis, split capabilities across isolated agents, or require human approval for the state-changing / external-comms step.",
+      "confidence": 0.7,
+      "references": [
+        "https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/",
+        "https://ai.meta.com/blog/practical-ai-agent-security/"
+      ]
+    }
+  ],
+  "probe": null,
+  "generated_at": "2026-06-17 19:23 UTC",
+  "notes": []
+}

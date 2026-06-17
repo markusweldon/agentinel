@@ -137,4 +137,22 @@ def check_capabilities(snapshot: ServerSnapshot) -> list[Finding]:
                 )
             )
 
+    # Secrets baked into the server's configured environment (from a parsed config file).
+    for key, value in (snapshot.env or {}).items():
+        if not isinstance(value, str):
+            continue
+        matched = next((label for pattern, label in _SECRET_PATTERNS if re.search(pattern, value)), None)
+        looks_secret = bool(re.search(r"(?i)(token|secret|api[_-]?key|password|passwd|credential)", key))
+        literal = len(value) >= 12 and not value.startswith("$") and "${" not in value
+        if matched or (looks_secret and literal):
+            findings.append(
+                Finding.from_attack(
+                    AttackClass.SECRETS_EXPOSURE,
+                    target=server_target,
+                    detail=f"Environment variable '{key}' in the config holds a hardcoded {matched or 'secret'}.",
+                    evidence=f"{key}={_redact(value)}",
+                    confidence=0.85 if matched else 0.7,
+                )
+            )
+
     return findings

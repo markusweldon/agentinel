@@ -1,0 +1,50 @@
+╭───────────────────────────────────╮
+│ trident — MCP security scan       │
+│ target:  /tmp/fleet-demo-mcp.json │
+│ server:  ?   tools: 5             │
+╰───────────────────────────────────╯
+Capability matrix (Rule of Two)                                
+                                                               
+                                 A           B          C      
+  Tool                       untrusted   sensitive   external  
+ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 
+  docs-fetcher:fetch_doc         ●           ·          ·      
+  notes-reader:list_files        ·           ·          ·      
+  notes-reader:read_file         ·           ●          ·      
+  docs-fetcher:search_docs       ·           ·          ·      
+  notifier:send_message          ·           ·          ●      
+                                                               
+
+                                                                                
+  Severity   OWASP   Class              Target              Title               
+ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 
+  HIGH       ASI02   lethal_trifecta    fleet               Cross-server        
+                                                            lethal trifecta     
+                                                            across connected    
+                                                            servers             
+  HIGH       ASI03   secrets_exposure   server:slack-noti   Secret exposed in   
+                                        fier                server              
+                                                            configuration       
+                                                                                
+
+● HIGH  Cross-server lethal trifecta across connected servers  [fleet]
+   No single server is a full trifecta, but the connected fleet combines all 
+three axes. A (untrusted-input): docs-fetcher; B (sensitive-access): 
+notes-reader; C (external-comms): notifier. An agent connected to all of these 
+can be injected through one server and steered to read sensitive data and 
+exfiltrate it through another.
+   evidence: cross-server A+B+C
+   fix: Break the trifecta: remove one axis, split capabilities across isolated 
+agents, or require human approval for the state-changing / external-comms step.
+   ASI02: Tool Misuse and Exploitation  ·  confidence 0.70
+
+● HIGH  Secret exposed in server configuration  [server:slack-notifier]
+   Environment variable 'SLACK_TOKEN' in the config holds a hardcoded Slack 
+token.
+   evidence: SLACK_TOKEN=xoxb***
+   fix: Load secrets from a secret manager or runtime environment, never commit 
+them to config, and rotate any exposed credential.
+   ASI03: Identity and Privilege Abuse  ·  confidence 0.85
+
+2 findings  (2 high)
+result: FAIL  (--fail-on high)

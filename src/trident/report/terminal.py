@@ -99,6 +99,9 @@ def render_report(
     header.append(f"server:  {tgt.server_name or '?'}   tools: {len(report.tools)}", style="dim")
     console.print(Panel(header, expand=False, border_style="cyan"))
 
+    for note in report.notes:
+        console.print(Text(f"  ⚠ {note}", style="yellow"))
+
     cap = _capability_table(report)
     if cap is not None:
         console.print(cap)

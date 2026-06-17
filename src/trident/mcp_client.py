@@ -37,6 +37,7 @@ class ServerSnapshot(BaseModel):
     resources: list[dict] = Field(default_factory=list)
     prompts: list[dict] = Field(default_factory=list)
     command: str | None = None
+    env: dict[str, str] | None = None
 
 
 @asynccontextmanager
