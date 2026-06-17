@@ -1,0 +1,50 @@
+name: "trident MCP scan"
+description: "Statically scan an MCP server for OWASP Agentic Top 10 risks and upload SARIF."
+branding:
+  icon: shield
+  color: blue
+
+inputs:
+  stdio:
+    description: "Command to launch the MCP server over stdio (mutually exclusive with http)."
+    required: false
+  http:
+    description: "Streamable-HTTP MCP server URL (mutually exclusive with stdio)."
+    required: false
+  fail-on:
+    description: "Severity gate: info | low | medium | high | critical."
+    required: false
+    default: "high"
+  sarif:
+    description: "Path to write the SARIF report."
+    required: false
+    default: "trident.sarif"
+  ref:
+    description: "trident git ref to install."
+    required: false
+    default: "main"
+
+runs:
+  using: composite
+  steps:
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+    - name: Run trident scan
+      shell: bash
+      run: |
+        set -euo pipefail
+        SRC="git+https://github.com/markusweldon/trident@${{ inputs.ref }}"
+        if [ -n "${{ inputs.stdio }}" ]; then
+          uvx --from "$SRC" trident scan --stdio "${{ inputs.stdio }}" \
+            --fail-on "${{ inputs.fail-on }}" --sarif "${{ inputs.sarif }}"
+        elif [ -n "${{ inputs.http }}" ]; then
+          uvx --from "$SRC" trident scan --http "${{ inputs.http }}" \
+            --fail-on "${{ inputs.fail-on }}" --sarif "${{ inputs.sarif }}"
+        else
+          echo "::error::provide either 'stdio' or 'http' input"; exit 2
+        fi
+    - name: Upload SARIF
+      if: always()
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ${{ inputs.sarif }}

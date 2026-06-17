@@ -1,0 +1,68 @@
+[project]
+name = "mcp-trident"
+version = "0.1.0"
+description = "Red-team and statically audit MCP servers and AI agents against the OWASP Agentic Top 10 (2026)."
+authors = [{ name = "Markus Weldon" }]
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+keywords = [
+    "mcp",
+    "model-context-protocol",
+    "security",
+    "owasp",
+    "agentic-ai",
+    "red-team",
+    "prompt-injection",
+    "ai-security",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Security",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "mcp>=1.20",
+    "pydantic>=2.7",
+    "typer>=0.12",
+    "rich>=13.7",
+    "anthropic>=0.40",
+    "jinja2>=3.1",
+]
+
+[project.scripts]
+trident = "trident.cli:main"
+trident-mcp = "trident.server:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/trident"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["typer.Option", "typer.Argument"]
+
+[tool.ruff.lint.per-file-ignores]
+# The HTML scorecard is a single embedded template; long CSS/markup lines are expected.
+"src/trident/report/html.py" = ["E501"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
