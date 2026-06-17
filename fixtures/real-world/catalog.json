@@ -1,0 +1,65 @@
+{
+  "_note": "Tool definitions copied from the published specs of popular MCP servers (no code is executed). Used to validate trident against real-world tool metadata rather than only its own fixtures.",
+  "github": [
+    {"name": "issue_read", "description": "Fetch issue details, comments, sub-issues, and labels"},
+    {"name": "list_issues", "description": "List issues in a repository with filtering and sorting"},
+    {"name": "pull_request_read", "description": "Get pull request details, diffs, files, commits, and reviews"},
+    {"name": "get_discussion_comments", "description": "Retrieve comments within a discussion"},
+    {"name": "list_notifications", "description": "Display notifications with filtering"},
+    {"name": "get_file_contents", "description": "Read file or directory contents from a repository"},
+    {"name": "get_me", "description": "Access the authenticated user's profile information"},
+    {"name": "list_repository_collaborators", "description": "Show repository collaborators"},
+    {"name": "get_secret_scanning_alert", "description": "Retrieve exposed secret alert details"},
+    {"name": "create_or_update_file", "description": "Write or modify file content in a repository"},
+    {"name": "push_files", "description": "Commit and push multiple files to a repository"},
+    {"name": "create_pull_request", "description": "Open a new pull request"},
+    {"name": "merge_pull_request", "description": "Merge a pull request"},
+    {"name": "issue_write", "description": "Create or modify issues"},
+    {"name": "delete_file", "description": "Remove a file from a repository"}
+  ],
+  "filesystem": [
+    {"name": "read_text_file", "description": "Retrieve complete file contents as text"},
+    {"name": "read_media_file", "description": "Read an image or audio file and return base64 data"},
+    {"name": "read_multiple_files", "description": "Load several files simultaneously"},
+    {"name": "list_directory", "description": "Display directory contents"},
+    {"name": "directory_tree", "description": "Recursive JSON tree of a directory hierarchy"},
+    {"name": "search_files", "description": "Recursively find files matching a pattern"},
+    {"name": "get_file_info", "description": "Retrieve file metadata (size, timestamps, permissions)"},
+    {"name": "write_file", "description": "Create new files or overwrite existing ones"},
+    {"name": "edit_file", "description": "Make selective edits to a file using pattern matching"},
+    {"name": "create_directory", "description": "Create a new directory"},
+    {"name": "move_file", "description": "Rename or relocate a file or directory"}
+  ],
+  "git": [
+    {"name": "git_status", "description": "Shows the working tree status"},
+    {"name": "git_diff", "description": "Shows differences between branches or commits"},
+    {"name": "git_log", "description": "Shows the commit logs"},
+    {"name": "git_show", "description": "Shows the contents of a commit"},
+    {"name": "git_commit", "description": "Records changes to the repository"},
+    {"name": "git_add", "description": "Adds file contents to the staging area"},
+    {"name": "git_create_branch", "description": "Creates a new branch"},
+    {"name": "git_checkout", "description": "Switches branches"}
+  ],
+  "fetch": [
+    {"name": "fetch", "description": "Fetches a URL from the internet and extracts its contents as markdown"}
+  ],
+  "time": [
+    {"name": "get_current_time", "description": "Get the current time in a specific timezone"},
+    {"name": "convert_time", "description": "Convert a time between timezones"}
+  ],
+  "slack": [
+    {"name": "slack_get_channel_history", "description": "Get recent messages from a channel"},
+    {"name": "slack_get_thread_replies", "description": "Get all replies in a message thread"},
+    {"name": "slack_list_channels", "description": "List public channels in the workspace"},
+    {"name": "slack_get_users", "description": "Get a list of workspace users with profile information"},
+    {"name": "slack_post_message", "description": "Post a new message to a channel"},
+    {"name": "slack_reply_to_thread", "description": "Reply to a specific message thread"}
+  ],
+  "memory": [
+    {"name": "create_entities", "description": "Create multiple new entities in the knowledge graph"},
+    {"name": "add_observations", "description": "Add observations to existing entities"},
+    {"name": "delete_entities", "description": "Delete entities and their relations"},
+    {"name": "read_graph", "description": "Read the entire knowledge graph"},
+    {"name": "search_nodes", "description": "Search for nodes in the knowledge graph"}
+  ]
+}

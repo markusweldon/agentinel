@@ -101,15 +101,29 @@ v1 focuses on what is observable from a single MCP server; multi-agent categorie
 
 ---
 
-## Tested against itself
+## Evaluation
 
-trident ships a labeled fixture corpus (`fixtures/`) of deliberately vulnerable and benign-control servers, and tests itself against it:
+**Regression guard (own fixtures).** A labeled corpus (`fixtures/`) of deliberately vulnerable and benign-control servers; CI fails if recall drops or a clean control trips a finding:
 
 ```bash
-uv run pytest -q -s         # [self-eval] recall=100.00%  precision=100.00%  (0 false positives)
+uv run pytest -q -s         # [self-eval] recall=100%  precision=100%  (0 false positives)
 ```
 
-"Evals are the new training data" — the corpus is ground truth, and CI fails if recall drops or a clean control trips a finding.
+That proves the detectors don't regress — but it's trident grading its own homework. The real test is tool definitions it *didn't* write:
+
+**Real-world catalog.** [`fixtures/real-world/catalog.json`](fixtures/real-world/catalog.json) holds the published tool specs of popular MCP servers (copied from their docs, never executed). trident's verdicts:
+
+| Server | Axes | Verdict |
+|---|:--:|---|
+| **GitHub** | A·B·C | 🔴 lethal trifecta — reads issues/PRs (untrusted), reads private repo + secret alerts, creates/pushes/merges |
+| filesystem | B·C | 🟡 near-trifecta (reads + writes local files) |
+| git | B·C | 🟡 near-trifecta |
+| Slack | A·C | 🟡 near-trifecta (reads channel history, posts messages) |
+| fetch | A | ✅ clean |
+| time | — | ✅ clean |
+| memory | C | ✅ clean |
+
+The GitHub verdict matches the real [GitHub MCP exploit](https://invariantlabs.ai/blog/mcp-github-vulnerability) Invariant Labs disclosed — its lethal trifecta is exactly what trident flags, while fetch/time/memory stay quiet.
 
 ---
 

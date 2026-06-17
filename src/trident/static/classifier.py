@@ -52,6 +52,21 @@ _A_TERMS = [
     "search web",
     "untrusted",
     "third party",
+    "issue",
+    "issues",
+    "pull request",
+    "pull requests",
+    "discussion",
+    "discussions",
+    "comment",
+    "comments",
+    "gist",
+    "notification",
+    "notifications",
+    "review",
+    "reviews",
+    "thread",
+    "history",
 ]
 
 # B — reaches sensitive data or systems.
@@ -97,6 +112,10 @@ _B_TERMS = [
     "salary",
     "etc passwd",
     "config file",
+    "file",
+    "files",
+    "file contents",
+    "media file",
 ]
 
 # C — changes state or communicates outward.
