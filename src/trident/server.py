@@ -1,19 +1,25 @@
-"""trident as an MCP server — audit other MCP servers from inside Claude Code / Cursor.
+"""trident as an MCP server — assess MCP tool definitions from inside Claude Code / Cursor.
 
-Install it as a tool in your assistant, then ask it to scan a server you're about to add:
+Safe by design: this server never launches a process and never makes a network request. It only
+analyzes the tool *metadata you pass in* — the same definitions an assistant already holds for the
+servers it is connected to — and returns OWASP Agentic Top 10 findings, including the Lethal
+Trifecta analysis.
+
+This deliberately does NOT expose a "scan this command / URL" tool: handing an agent the ability to
+launch arbitrary processes or fetch arbitrary URLs is the exact Lethal-Trifecta footgun trident
+exists to flag. Live scanning that launches or connects to a server lives in the `trident` CLI,
+where a human supplies the target explicitly.
 
     claude mcp add trident -- uv run trident-mcp
-
-Only the static `scan` is exposed here (read-only, no tools executed). Adaptive probing stays
-in the CLI, where authorization and API-key handling are explicit.
 """
 
 from __future__ import annotations
 
 from mcp.server.fastmcp import FastMCP
 
-from .models import Report
-from .scanner import scan_http, scan_stdio
+from .mcp_client import ServerSnapshot
+from .models import Report, TargetInfo, ToolInfo
+from .scanner import analyze
 
 mcp = FastMCP("trident")
 
@@ -38,18 +44,29 @@ def _summary(report: Report) -> dict:
 
 
 @mcp.tool()
-async def scan_stdio_server(command: str) -> dict:
-    """Statically scan an MCP server launched via the given stdio command.
+def assess_tools(server_name: str, tools: list[dict]) -> dict:
+    """Statically assess MCP tool definitions for OWASP Agentic Top 10 risks.
 
-    Returns a summary of OWASP Agentic Top 10 findings. Does not execute the server's tools.
+    Pass the tools you want checked, each as an object with at least ``name`` and ``description``
+    (optionally ``inputSchema`` and ``annotations``). trident analyzes only the metadata you
+    provide — it does not launch or connect to anything — and returns findings, including
+    Lethal-Trifecta / Rule-of-Two analysis across the toolset.
     """
-    return _summary(await scan_stdio(command, quiet=True))
-
-
-@mcp.tool()
-async def scan_http_server(url: str) -> dict:
-    """Statically scan a streamable-HTTP MCP server at the given URL."""
-    return _summary(await scan_http(url))
+    snapshot = ServerSnapshot(
+        server_name=server_name,
+        tools=[
+            ToolInfo(
+                server=server_name,
+                name=str(t.get("name", "")),
+                description=t.get("description"),
+                input_schema=t.get("inputSchema") or t.get("input_schema") or {},
+                annotations=t.get("annotations"),
+            )
+            for t in tools
+        ],
+    )
+    report = analyze([snapshot], target=TargetInfo(transport="config", server_name=server_name))
+    return _summary(report)
 
 
 def main() -> None:
