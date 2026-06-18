@@ -37,6 +37,14 @@ class AnthropicChat:
         self.model = model
         self.max_tokens = max_tokens
         if client is None:
+            # Trust the OS certificate store so the SDK works behind TLS-inspection proxies
+            # (corporate networks, sandboxes) whose root CA isn't in certifi's bundle.
+            try:
+                import truststore
+
+                truststore.inject_into_ssl()
+            except Exception:
+                pass
             import anthropic  # lazy import — static scanning never needs it
 
             client = anthropic.Anthropic()
