@@ -18,6 +18,7 @@ from .report.sarif import to_sarif
 from .report.terminal import render_report
 from .scanner import scan_config, scan_http, scan_stdio
 from .static.drift import apply_drift
+from .static.llm_classifier import llm_classifier
 from .taxonomy import Severity
 
 app = typer.Typer(
@@ -66,19 +67,34 @@ def scan(
     baseline: Path = typer.Option(
         None, "--baseline", help="Detect rug-pull drift vs this baseline file (created on first run, then compared)."
     ),
+    llm_classify: bool = typer.Option(
+        False,
+        "--llm-classify",
+        help="Classify tool capabilities with an LLM (needs ANTHROPIC_API_KEY); heuristic fallback.",
+    ),
+    classify_model: str = typer.Option("claude-sonnet-4-6", "--classify-model", help="Model used by --llm-classify."),
 ) -> None:
     """Statically scan a single MCP server (static analysis only; no tools are invoked)."""
     if sum(bool(x) for x in (stdio, http, config)) != 1:
         err.print("[red]Provide exactly one of --stdio '<command>', --http <url>, or --config <path>.[/red]")
         raise typer.Exit(2)
 
+    classifier = None
+    if llm_classify:
+        if not os.environ.get("ANTHROPIC_API_KEY"):
+            err.print("[red]--llm-classify needs ANTHROPIC_API_KEY in the environment.[/red]")
+            raise typer.Exit(2)
+        classifier = llm_classifier(classify_model)
+
     try:
         if stdio:
-            report = asyncio.run(scan_stdio(stdio, timeout=timeout, inherit_env=inherit_env, quiet=quiet))
+            report = asyncio.run(
+                scan_stdio(stdio, timeout=timeout, inherit_env=inherit_env, quiet=quiet, classifier=classifier)
+            )
         elif http:
-            report = asyncio.run(scan_http(http, timeout=timeout))
+            report = asyncio.run(scan_http(http, timeout=timeout, classifier=classifier))
         else:
-            report = asyncio.run(scan_config(str(config), timeout=timeout, quiet=quiet))
+            report = asyncio.run(scan_config(str(config), timeout=timeout, quiet=quiet, classifier=classifier))
     except Exception as exc:  # noqa: BLE001 - surface any connection/enumeration failure cleanly
         err.print(f"[red]Failed to scan target:[/red] {exc}")
         raise typer.Exit(2) from exc

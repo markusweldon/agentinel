@@ -14,9 +14,7 @@ from agentinel.models import ToolInfo
 from agentinel.scanner import analyze
 from agentinel.taxonomy import AttackClass, Severity
 
-_CATALOG = json.loads(
-    (Path(__file__).resolve().parent.parent / "fixtures" / "real-world" / "catalog.json").read_text()
-)
+_CATALOG = json.loads((Path(__file__).resolve().parent.parent / "fixtures" / "real-world" / "catalog.json").read_text())
 
 
 def _findings(server: str):
@@ -28,9 +26,7 @@ def test_github_server_is_a_full_trifecta():
     # GitHub's MCP server reads issues/PRs (untrusted), reads private repo + secret alerts,
     # and creates/pushes/merges — the lethal trifecta Invariant Labs disclosed in the wild.
     fs = _findings("github")
-    assert any(
-        f.attack_class is AttackClass.LETHAL_TRIFECTA and f.severity is Severity.HIGH for f in fs
-    )
+    assert any(f.attack_class is AttackClass.LETHAL_TRIFECTA and f.severity is Severity.HIGH for f in fs)
 
 
 def test_benign_servers_have_no_actionable_findings():
