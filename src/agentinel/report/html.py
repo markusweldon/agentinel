@@ -72,8 +72,10 @@ _TEMPLATE = """<!doctype html>
 
   <header>
     <svg class="logo" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 2v20"/><path d="M5 5v4a7 7 0 0 0 14 0V5"/><path d="M5 5 3 7M19 5l2 2"/><path d="M9 22h6"/>
+      stroke-width="1.8" stroke-linejoin="round">
+      <path d="M12 2 L21 5.4 V11.5 C21 17 17 20.6 12 22.5 C7 20.6 3 17 3 11.5 V5.4 Z"/>
+      <path d="M5.5 12 C8 8.8 16 8.8 18.5 12 C16 15.2 8 15.2 5.5 12 Z"/>
+      <circle cx="12" cy="12" r="2.3" fill="currentColor" stroke="none"/>
     </svg>
     <h1>Agentinel<span class="v">v{{ version }}</span></h1>
   </header>

@@ -4,7 +4,7 @@
   <img src="docs/hero.svg" alt="Agentinel — MCP security scanner" width="840">
 </p>
 
-> **A sentinel for your AI agents.** Red-team and statically audit MCP servers against the **OWASP Top 10 for Agentic Applications (2026)**.
+> **A sentinel for your AI agents.** Statically audit MCP servers and agent fleets for the **lethal trifecta**, tool poisoning, and leaked secrets — with findings mapped to the **OWASP Agentic Top 10 (2026)**. Plus an experimental adaptive red-team probe.
 
 [![CI](https://github.com/markusweldon/agentinel/actions/workflows/ci.yml/badge.svg)](https://github.com/markusweldon/agentinel/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
@@ -16,7 +16,7 @@ A basic MCP server is a thin wrapper over an API — and in 2026 there are tens 
 It does two things no open-source tool does together:
 
 1. **`agentinel scan`** — statically classifies every tool into the **Lethal Trifecta / Rule-of-Two** axes and flags the dangerous combination (within one server *or across your whole fleet*), plus tool poisoning, shadowing, unsafe execution, secrets, and unpinned (rug-pull) servers.
-2. **`agentinel probe`** — an **adaptive, "attacker-moves-second"** red-team that drives a live agent against the server and tries to exfiltrate a planted canary, escalating its injections each round.
+2. **`agentinel probe`** — an **adaptive, "attacker-moves-second"** red-team that drives a live agent against the server and tries to exfiltrate a planted canary, escalating its injections each round. *(Experimental: the loop is unit-tested with a scripted model; live-model validation is in progress.)*
 
 Every finding maps to an OWASP ASI category and exports to terminal, JSON, **SARIF** (GitHub code scanning), and a self-contained **HTML dashboard**.
 
@@ -51,6 +51,8 @@ Capability matrix (Rule of Two)
 ```
 
 Add `--html report.html` for the dashboard pictured at the top of this README, or `--sarif findings.sarif` for GitHub's Security tab. Sample reports live in [`examples/`](examples/).
+
+> **Viewing the dashboard.** GitHub can't render a committed `.html` inline, so the SVG banner above is the in-page preview. For the real interactive dashboard: open `examples/fleet-scan.html` locally, or — once this repo is public — use the [live HTML preview](https://htmlpreview.github.io/?https://raw.githubusercontent.com/markusweldon/agentinel/main/examples/fleet-scan.html) or the GitHub Pages deployment. (Drop a PNG at `docs/dashboard.png` and it renders inline anywhere.)
 
 ## Scan your own setup
 

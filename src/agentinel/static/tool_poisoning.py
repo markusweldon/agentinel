@@ -5,12 +5,16 @@ Scans every tool description, parameter description, and the server-level instru
   - prompt-injection phrasing (instruction overrides, concealment from the user, coerced actions),
   - references to credential files an honest tool description would never mention.
 
+All signals found on a single tool are grouped into one finding (rather than one finding per
+matched pattern) to keep reports readable.
+
 Reference: Invariant Labs, "MCP Tool Poisoning Attacks".
 """
 
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 
 from ..mcp_client import ServerSnapshot
 from ..models import Finding
@@ -46,6 +50,15 @@ _SENSITIVE_FILE_PATTERNS: list[tuple[str, str, float]] = [
 ]
 
 
+@dataclass
+class _Signal:
+    severity: Severity
+    confidence: float
+    label: str
+    snippet: str
+    where: str
+
+
 def _snippet(text: str, start: int, end: int, pad: int = 24) -> str:
     s = max(0, start - pad)
     e = min(len(text), end + pad)
@@ -53,27 +66,21 @@ def _snippet(text: str, start: int, end: int, pad: int = 24) -> str:
     return (("…" if s > 0 else "") + out + ("…" if e < len(text) else ""))[:160]
 
 
-def _scan_text(text: str, *, target: str, where: str) -> list[Finding]:
-    findings: list[Finding] = []
+def _scan_text(text: str, *, where: str) -> list[_Signal]:
+    signals: list[_Signal] = []
     if not text:
-        return findings
+        return signals
 
-    # Invisible / bidi / tag characters.
     invisible = [m.start() for m in _INVISIBLE_RE.finditer(text)]
     if invisible:
         codepoints = sorted({f"U+{ord(text[i]):04X}" for i in invisible})
-        findings.append(
-            Finding.from_attack(
-                AttackClass.TOOL_POISONING,
-                target=target,
-                severity=Severity.HIGH,
-                detail=(
-                    f"The {where} contains {len(invisible)} invisible/bidirectional Unicode "
-                    f"character(s) ({', '.join(codepoints)}) — a common vehicle for hiding "
-                    "instructions from human reviewers while the model still reads them."
-                ),
-                evidence=f"hidden codepoints: {', '.join(codepoints)}",
-                confidence=0.95,
+        signals.append(
+            _Signal(
+                Severity.HIGH,
+                0.95,
+                f"invisible/bidi Unicode ({len(invisible)} chars)",
+                f"hidden codepoints: {', '.join(codepoints)}",
+                where,
             )
         )
 
@@ -81,39 +88,49 @@ def _scan_text(text: str, *, target: str, where: str) -> list[Finding]:
     for pattern, label, confidence in _INJECTION_PATTERNS + _SENSITIVE_FILE_PATTERNS:
         m = re.search(pattern, lowered)
         if m:
-            findings.append(
-                Finding.from_attack(
-                    AttackClass.TOOL_POISONING,
-                    target=target,
-                    severity=Severity.HIGH if confidence >= 0.7 else Severity.MEDIUM,
-                    detail=(
-                        f"The {where} contains text resembling a hidden instruction ({label}). "
-                        "Tool metadata is read by the agent and must not carry directives."
-                    ),
-                    evidence=_snippet(text, m.start(), m.end()),
-                    confidence=confidence,
-                )
-            )
-    return findings
+            severity = Severity.HIGH if confidence >= 0.7 else Severity.MEDIUM
+            signals.append(_Signal(severity, confidence, label, _snippet(text, m.start(), m.end()), where))
+    return signals
+
+
+def _finding_from_signals(target: str, signals: list[_Signal]) -> Finding:
+    labels: list[str] = []
+    for s in signals:
+        if s.label not in labels:
+            labels.append(s.label)
+    severity = max(signals, key=lambda s: s.severity.rank).severity
+    top = max(signals, key=lambda s: s.confidence)
+    n = len(labels)
+    return Finding.from_attack(
+        AttackClass.TOOL_POISONING,
+        target=target,
+        severity=severity,
+        detail=(
+            f"This server's tool metadata carries text resembling hidden instructions "
+            f"({n} signal{'s' if n != 1 else ''}: {', '.join(labels)}). Tool metadata is read by the "
+            "agent and must not carry directives."
+        ),
+        evidence=f"{top.where} — {top.snippet}",
+        confidence=top.confidence,
+    )
 
 
 def check_tool_poisoning(snapshot: ServerSnapshot) -> list[Finding]:
     findings: list[Finding] = []
+
     for t in snapshot.tools:
-        findings += _scan_text(t.description or "", target=t.qualified_name, where="tool description")
+        signals = _scan_text(t.description or "", where="tool description")
         props = (t.input_schema or {}).get("properties", {})
         if isinstance(props, dict):
             for pname, pinfo in props.items():
                 if isinstance(pinfo, dict) and pinfo.get("description"):
-                    findings += _scan_text(
-                        str(pinfo["description"]),
-                        target=t.qualified_name,
-                        where=f"description of parameter '{pname}'",
-                    )
+                    signals += _scan_text(str(pinfo["description"]), where=f"parameter '{pname}'")
+        if signals:
+            findings.append(_finding_from_signals(t.qualified_name, signals))
+
     if snapshot.instructions:
-        findings += _scan_text(
-            snapshot.instructions,
-            target=f"server:{snapshot.server_name}",
-            where="server instructions",
-        )
+        server_signals = _scan_text(snapshot.instructions, where="server instructions")
+        if server_signals:
+            findings.append(_finding_from_signals(f"server:{snapshot.server_name}", server_signals))
+
     return findings
