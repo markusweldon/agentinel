@@ -113,11 +113,14 @@ That proves the detectors don't regress — but it's Agentinel grading its own h
 | Server | Axes | Verdict |
 |---|:--:|---|
 | **GitHub** | A·B·C | 🔴 lethal trifecta — reads issues/PRs (untrusted), reads private repo + secret alerts, creates/pushes/merges |
+| **Notion** | A·B·C | 🔴 lethal trifecta — reads comments + database (untrusted), writes pages |
 | Puppeteer | A | 🟠 unsafe code execution — `evaluate` runs arbitrary JavaScript |
+| Kubernetes | B·C | 🟠 code execution — `kubectl_generic` runs any command (also near-trifecta) |
 | filesystem | B·C | 🟡 near-trifecta (reads + writes local files) |
 | git | B·C | 🟡 near-trifecta |
 | GitLab | B·C | 🟡 near-trifecta (write-focused — correctly *not* flagged as a full trifecta) |
 | Slack | A·C | 🟡 near-trifecta (reads channel history, posts messages) |
+| Stripe | B·C | 🟡 near-trifecta (financial data + money movement) |
 | Sentry | A | ✅ clean (reads untrusted error content, but only one axis) |
 | Postgres | B | ✅ clean (read-only query — *not* mis-flagged as code execution) |
 | Google Drive | B | ✅ clean |

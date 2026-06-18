@@ -175,6 +175,9 @@ _C_TERMS = [
     "write file",
     "put",
     "patch",
+    "apply",
+    "scale",
+    "install",
 ]
 
 

@@ -37,6 +37,9 @@ _CODE_EXEC_TERMS = [
     "run java script",
     "evaluate javascript",
     "evaluate java script",
+    "execute any",
+    "run any",
+    "any command",
 ]
 
 _BROAD_TERMS = [

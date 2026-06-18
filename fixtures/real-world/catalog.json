@@ -86,5 +86,31 @@
   ],
   "gdrive": [
     {"name": "search", "description": "Search for files in Google Drive by query, returning names and MIME types"}
+  ],
+  "kubernetes": [
+    {"name": "kubectl_get", "description": "Retrieve or list Kubernetes resources"},
+    {"name": "kubectl_logs", "description": "Get logs from Kubernetes pods and containers"},
+    {"name": "kubectl_apply", "description": "Apply YAML manifests to the cluster"},
+    {"name": "kubectl_delete", "description": "Delete resources from the cluster"},
+    {"name": "kubectl_scale", "description": "Scale Kubernetes resources up or down"},
+    {"name": "kubectl_generic", "description": "Execute any kubectl command"}
+  ],
+  "stripe": [
+    {"name": "list_customers", "description": "List customer records and their details"},
+    {"name": "list_payment_intents", "description": "List payment intents and amounts"},
+    {"name": "retrieve_balance", "description": "Retrieve the account balance"},
+    {"name": "create_charge", "description": "Create a charge against a customer (moves money)"},
+    {"name": "create_refund", "description": "Create a refund (moves money)"},
+    {"name": "create_payment_link", "description": "Create a payment link"},
+    {"name": "stripe_api_write", "description": "Write data with any Stripe API POST, PATCH, PUT, or DELETE method"}
+  ],
+  "notion": [
+    {"name": "search", "description": "Find pages and data sources across the workspace"},
+    {"name": "retrieve_page_markdown", "description": "Read a page's full content as Markdown"},
+    {"name": "query_data_source", "description": "Query a data source (database) with filters and sorts"},
+    {"name": "retrieve_a_comment", "description": "Access individual comment content"},
+    {"name": "create_a_page", "description": "Create a new page under a parent"},
+    {"name": "update_page_markdown", "description": "Edit a page's content with Markdown"},
+    {"name": "create_a_comment", "description": "Post a new comment on a page"}
   ]
 }
