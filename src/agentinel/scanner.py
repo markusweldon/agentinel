@@ -43,8 +43,10 @@ async def scan_config(path: str, *, classifier=None, timeout: float = 30.0, quie
     for spec in specs:
         try:
             if spec.transport == "stdio":
+                assert spec.command is not None  # parse_config guarantees stdio specs carry a command
                 snap = await connect_stdio(spec.command, env=spec.env, timeout=timeout, quiet=quiet)
             else:
+                assert spec.url is not None  # ...and http specs carry a url
                 snap = await connect_http(spec.url, timeout=timeout)
         except Exception as exc:  # noqa: BLE001 - one bad server should not abort the fleet scan
             notes.append(f"could not connect to '{spec.name}': {exc}")

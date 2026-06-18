@@ -29,7 +29,7 @@ def check_fleet_trifecta(snapshots: list[ServerSnapshot]) -> list[Finding]:
     # A single-server trifecta is already reported by the per-server check.
     if any(_server_union(s).is_trifecta for s in snapshots):
         return []
-    union = reduce(lambda acc, t: acc.merged_with(t.axes), classified, CapabilityAxes())
+    union = reduce(lambda acc, ax: acc.merged_with(ax), [t.axes for t in classified if t.axes], CapabilityAxes())
     if not union.is_trifecta:
         return []
 

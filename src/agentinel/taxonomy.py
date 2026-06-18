@@ -53,7 +53,7 @@ class ASICategory(StrEnum):
     ASI10 = "ASI10"
 
     @property
-    def title(self) -> str:
+    def title(self) -> str:  # type: ignore[override]  # intentionally shadows str.title; never called as a method here
         return _ASI_TITLES[self]
 
     @property

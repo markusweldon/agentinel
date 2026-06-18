@@ -51,7 +51,9 @@ def check_trifecta(snapshot: ServerSnapshot) -> list[Finding]:
             )
 
     # 2. Server-aggregate trifecta across the toolset.
-    union: CapabilityAxes = reduce(lambda acc, t: acc.merged_with(t.axes), tools, CapabilityAxes())
+    union: CapabilityAxes = reduce(
+        lambda acc, ax: acc.merged_with(ax), [t.axes for t in tools if t.axes], CapabilityAxes()
+    )
     server_target = f"server:{snapshot.server_name}"
 
     if union.is_trifecta:

@@ -37,8 +37,10 @@ def _capability_table(report: Report) -> Table | None:
     table.add_column("A\nuntrusted", justify="center")
     table.add_column("B\nsensitive", justify="center")
     table.add_column("C\nexternal", justify="center")
-    for t in sorted(classified, key=lambda x: (not x.axes.is_trifecta, x.name)):
+    for t in sorted(classified, key=lambda x: (not (x.axes and x.axes.is_trifecta), x.name)):
         ax = t.axes
+        if ax is None:
+            continue
         table.add_row(
             t.qualified_name,
             _mark(ax.untrusted_input),
