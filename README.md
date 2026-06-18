@@ -79,19 +79,14 @@ uv run agentinel scan --config "$HOME/Library/Application Support/Claude/claude_
 
 ---
 
-## How it relates to other tools
+## Where it fits
 
-These are mature, well-resourced tools — Agentinel isn't trying to replace them. The table just shows where its *niche* sits: the cross-server capability view and a live-MCP probe, in the open.
+Agentinel is **open and educational**, focused on two things that are easy to miss in a busy agent setup:
 
-| Tool | Static checks | Adaptive live probing | Cross-server trifecta | Open source |
-|---|:--:|:--:|:--:|:--:|
-| Snyk Agent Scan (ex-Invariant `mcp-scan`) | ✓ | ✗ | partial (closed) | source-available |
-| MCP-Shield | ✓ | ✗ | ✗ | ✓ |
-| garak | targets the LLM | ✓ (LLM endpoint) | ✗ | ✓ |
-| promptfoo | eval | ✓ (LLM endpoint) | ✗ | ✓ |
-| **Agentinel** | ✓ | ⚠️ experimental (live MCP server) | ✓ | ✓ |
+- the **accidental cross-server trifecta** — individually-safe servers that combine into a real exfiltration path; and
+- an **adaptive probe aimed at the MCP tool surface** itself, not just the model endpoint.
 
-Its niche: **capability-combination analysis across a whole agent fleet**, plus an **adaptive probe aimed at the MCP tool surface** (not the model endpoint) — both open and free. It's not a better static engine than the vendors; it's a different, complementary angle.
+It's built to **complement** the agent-security tooling teams already run and the "secure at inception" mindset — surfacing dangerous capability combinations and risky tool metadata early, in a form anyone can read, run, and extend.
 
 ## How the signature checks work
 
