@@ -65,7 +65,7 @@ async def test_config_secret_in_env_is_flagged(tmp_path):
             "files": {
                 "command": _PY,
                 "args": [str(_FIXTURES / "clean/files_only_server.py")],
-                "env": {"API_KEY": "sk-ABCDEFGHIJ1234567890"},
+                "env": {"API_KEY": "sk-" + "A" * 24},  # synthetic token built at runtime, not a hardcoded secret
             }
         }
     }

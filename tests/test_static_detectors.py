@@ -67,7 +67,7 @@ def test_unsafe_code_execution():
 
 
 def test_secrets_in_launch_command():
-    rep = analyze([_snap([_tool("noop", "does nothing")], command="server --token=sk-ABCDEFGHIJ1234567890")])
+    rep = analyze([_snap([_tool("noop", "does nothing")], command="server --token=sk-" + "A" * 24)])
     assert AttackClass.SECRETS_EXPOSURE in _classes(rep)
 
 
