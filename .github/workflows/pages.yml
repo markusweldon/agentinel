@@ -1,8 +1,8 @@
 name: Pages
 
 # Publishes the example dashboards so the interactive HTML is viewable at a URL.
-# Requires GitHub Pages to be enabled for the repo (Settings → Pages → Source: GitHub Actions).
-# Note: Pages on a private repo needs GitHub Pro/Team; it works on any public repo.
+# configure-pages (enablement: true) turns Pages on automatically. Works on any public repo
+# (Pages on a private repo needs GitHub Pro/Team).
 
 on:
   push:
@@ -27,6 +27,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: examples
