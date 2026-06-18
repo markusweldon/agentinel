@@ -17,6 +17,7 @@ from .report.html import to_html
 from .report.sarif import to_sarif
 from .report.terminal import render_report
 from .scanner import scan_config, scan_http, scan_stdio
+from .static.drift import apply_drift
 from .taxonomy import Severity
 
 app = typer.Typer(
@@ -62,6 +63,9 @@ def scan(
         False, "--inherit-env", help="Forward the current environment to the stdio server."
     ),
     quiet: bool = typer.Option(True, "--quiet/--no-quiet", help="Suppress the scanned server's stderr."),
+    baseline: Path = typer.Option(
+        None, "--baseline", help="Detect rug-pull drift vs this baseline file (created on first run, then compared)."
+    ),
 ) -> None:
     """Statically scan a single MCP server (static analysis only; no tools are invoked)."""
     if sum(bool(x) for x in (stdio, http, config)) != 1:
@@ -78,6 +82,12 @@ def scan(
     except Exception as exc:  # noqa: BLE001 - surface any connection/enumeration failure cleanly
         err.print(f"[red]Failed to scan target:[/red] {exc}")
         raise typer.Exit(2) from exc
+
+    if baseline:
+        drift_findings, established = apply_drift(report.tools, baseline)
+        report.findings.extend(drift_findings)
+        if established:
+            report.notes.append(f"drift baseline established at {baseline}")
 
     render_report(report, fail_on=fail_on)
     _write_outputs(report, json_out, sarif_out, html_out)
