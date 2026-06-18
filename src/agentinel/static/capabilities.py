@@ -11,19 +11,32 @@ from .classifier import _matches, _normalize
 
 _CODE_EXEC_TERMS = [
     "exec",
-    "execute",
     "eval",
     "shell",
     "bash",
     "subprocess",
     "run command",
     "run code",
+    "run a command",
     "system command",
     "terminal",
     "spawn",
     "powershell",
     "arbitrary code",
     "arbitrary command",
+    "command injection",
+    # "execute" is intentionally NOT bare: it over-matches benign phrasing like "execute a
+    # read-only SQL query". Require it to be paired with a code/command/script/JS context.
+    "execute code",
+    "execute command",
+    "execute a command",
+    "execute script",
+    "execute javascript",
+    "execute java script",
+    "run javascript",
+    "run java script",
+    "evaluate javascript",
+    "evaluate java script",
 ]
 
 _BROAD_TERMS = [

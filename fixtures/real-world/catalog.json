@@ -61,5 +61,15 @@
     {"name": "delete_entities", "description": "Delete entities and their relations"},
     {"name": "read_graph", "description": "Read the entire knowledge graph"},
     {"name": "search_nodes", "description": "Search for nodes in the knowledge graph"}
+  ],
+  "puppeteer": [
+    {"name": "puppeteer_navigate", "description": "Navigate to any URL in the browser"},
+    {"name": "puppeteer_screenshot", "description": "Capture a screenshot of the page or an element"},
+    {"name": "puppeteer_click", "description": "Click an element on the page via a CSS selector"},
+    {"name": "puppeteer_fill", "description": "Fill an input field with a text value"},
+    {"name": "puppeteer_evaluate", "description": "Execute JavaScript in the browser console"}
+  ],
+  "postgres": [
+    {"name": "query", "description": "Execute read-only SQL queries against the connected database"}
   ]
 }

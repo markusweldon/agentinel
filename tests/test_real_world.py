@@ -30,9 +30,19 @@ def test_github_server_is_a_full_trifecta():
 
 
 def test_benign_servers_have_no_actionable_findings():
-    for server in ("fetch", "time", "memory"):
+    for server in ("fetch", "time", "memory", "postgres"):
         actionable = [f for f in _findings(server) if f.severity.rank >= Severity.LOW.rank]
         assert not actionable, f"{server}: {[f.attack_class.value for f in actionable]}"
+
+
+def test_postgres_readonly_query_not_flagged_as_code_execution():
+    # Regression: "execute read-only SQL queries" must not trip the code-execution detector.
+    assert not any(f.attack_class is AttackClass.UNSAFE_CODE_EXECUTION for f in _findings("postgres"))
+
+
+def test_puppeteer_js_eval_flagged_as_code_execution():
+    # Puppeteer's evaluate tool runs arbitrary JavaScript — that should flag.
+    assert any(f.attack_class is AttackClass.UNSAFE_CODE_EXECUTION for f in _findings("puppeteer"))
 
 
 def test_near_trifecta_servers_are_info_not_high():
