@@ -11,14 +11,24 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![OWASP Agentic Top 10](https://img.shields.io/badge/OWASP-Agentic%20Top%2010%3A2026-red)](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/)
 
-A basic MCP server is a thin wrapper over an API — and in 2026 there are tens of thousands of them. The hard, unsolved problem isn't *building* one; it's knowing whether the agent that connects to it can be **turned against you**. Agentinel is a security scanner for the agent layer itself.
+AI assistants now connect to many MCP servers at once. Individually those servers are usually fine — but **wire enough of them together and you can accidentally hand one agent the "lethal trifecta": access to untrusted content + sensitive data + a way to send data out** — which is all a prompt injection needs to exfiltrate. Agentinel makes that capability surface visible and flags the concrete footguns.
 
-It does two things no open-source tool does together:
+It builds directly on prior work — Simon Willison's [Lethal Trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/), Meta's [Rule of Two](https://ai.meta.com/blog/practical-ai-agent-security/), and the [OWASP Agentic Top 10](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/). It doesn't invent those ideas; it **operationalizes them** as an automatic check, so you don't have to threat-model your agent setup by hand.
 
-1. **`agentinel scan`** — statically classifies every tool into the **Lethal Trifecta / Rule-of-Two** axes and flags the dangerous combination (within one server *or across your whole fleet*), plus tool poisoning, shadowing, unsafe execution, secrets, and unpinned (rug-pull) servers.
-2. **`agentinel probe`** — an **adaptive, "attacker-moves-second"** red-team that drives a live agent against the server and tries to exfiltrate a planted canary, escalating its injections each round. *(Experimental: the loop is unit-tested with a scripted model; live-model validation is in progress.)*
+**`agentinel scan`** (static, no API key, never runs your tools) reports:
+- the **cross-server lethal trifecta** — when no single server is dangerous, but the *combination* you assembled is (the case that's easy to miss);
+- concrete, fixable issues: **tool poisoning** (hidden instructions in a tool's metadata), **leaked secrets** in config, **rug-pull drift** (a tool's definition changing after you approved it), unsafe code-execution surfaces, over-broad permissions, and cross-server name shadowing;
+- a per-tool **capability matrix** (Rule of Two) so you can see exactly where to break the trifecta.
 
-Every finding maps to an OWASP ASI category and exports to terminal, JSON, **SARIF** (GitHub code scanning), and a self-contained **HTML dashboard**.
+**`agentinel probe`** is an **experimental** adaptive, "attacker-moves-second" red-team that drives a live agent against a server and tries to exfiltrate a planted canary. *(The loop is unit-tested with a scripted model; it has not yet been validated against a live model — treat its output as a starting point, not proof.)*
+
+Findings map to an OWASP ASI category and export to terminal, JSON, **SARIF** (GitHub code scanning), and a self-contained **HTML dashboard**.
+
+### What it is — and isn't
+- ✅ An **open, educational** auditor that makes a known threat model automatic, catches the *accidental* multi-server trifecta, and finds real, fixable bugs (poisoning, secrets, drift).
+- ✅ **Complementary** to commercial scanners (e.g. Snyk Agent Scan) — it adds the cross-server/fleet view and an adaptive probe; it isn't a replacement.
+- ⚠️ **Heuristic and early (v0.1).** The capability classifier is keyword-based (sharpen borderline cases with `--llm-classify`); static coverage is the MCP-observable subset of the OWASP ASI list (ASI01–05); the probe is experimental.
+- ❌ Not novel research, not a managed security product, not a guarantee — a clean signal and a starting point, not the last word.
 
 ---
 
@@ -67,17 +77,19 @@ uv run agentinel scan --config "$HOME/Library/Application Support/Claude/claude_
 
 ---
 
-## Why Agentinel is different
+## How it relates to other tools
 
-| Tool | Static checks | Adaptive live probing | Lethal-Trifecta / Rule-of-Two | Open source |
+These are mature, well-resourced tools — Agentinel isn't trying to replace them. The table just shows where its *niche* sits: the cross-server capability view and a live-MCP probe, in the open.
+
+| Tool | Static checks | Adaptive live probing | Cross-server trifecta | Open source |
 |---|:--:|:--:|:--:|:--:|
 | Snyk Agent Scan (ex-Invariant `mcp-scan`) | ✓ | ✗ | partial (closed) | source-available |
 | MCP-Shield | ✓ | ✗ | ✗ | ✓ |
 | garak | targets the LLM | ✓ (LLM endpoint) | ✗ | ✓ |
 | promptfoo | eval | ✓ (LLM endpoint) | ✗ | ✓ |
-| **Agentinel** | ✓ | ✓ (**live MCP server**) | ✓ | ✓ |
+| **Agentinel** | ✓ | ⚠️ experimental (live MCP server) | ✓ | ✓ |
 
-The two open gaps Agentinel fills: a clean **capability-combination** analysis across an agent's whole toolset, and **adaptive injection probing of a live MCP server** (existing dynamic tools aim at the model endpoint, not the MCP tool surface).
+Its niche: **capability-combination analysis across a whole agent fleet**, plus an **adaptive probe aimed at the MCP tool surface** (not the model endpoint) — both open and free. It's not a better static engine than the vendors; it's a different, complementary angle.
 
 ## How the signature checks work
 
