@@ -113,14 +113,19 @@ That proves the detectors don't regress — but it's Agentinel grading its own h
 | Server | Axes | Verdict |
 |---|:--:|---|
 | **GitHub** | A·B·C | 🔴 lethal trifecta — reads issues/PRs (untrusted), reads private repo + secret alerts, creates/pushes/merges |
+| Puppeteer | A | 🟠 unsafe code execution — `evaluate` runs arbitrary JavaScript |
 | filesystem | B·C | 🟡 near-trifecta (reads + writes local files) |
 | git | B·C | 🟡 near-trifecta |
+| GitLab | B·C | 🟡 near-trifecta (write-focused — correctly *not* flagged as a full trifecta) |
 | Slack | A·C | 🟡 near-trifecta (reads channel history, posts messages) |
+| Sentry | A | ✅ clean (reads untrusted error content, but only one axis) |
+| Postgres | B | ✅ clean (read-only query — *not* mis-flagged as code execution) |
+| Google Drive | B | ✅ clean |
 | fetch | A | ✅ clean |
-| time | — | ✅ clean |
 | memory | C | ✅ clean |
+| time | — | ✅ clean |
 
-The GitHub verdict matches the real [GitHub MCP exploit](https://invariantlabs.ai/blog/mcp-github-vulnerability) Invariant Labs disclosed — its lethal trifecta is exactly what Agentinel flags, while fetch/time/memory stay quiet.
+The GitHub verdict matches the real [GitHub MCP exploit](https://invariantlabs.ai/blog/mcp-github-vulnerability) Invariant Labs disclosed. Just as important is what Agentinel *doesn't* flag: GitLab (write-focused) is near-trifecta not full, Postgres's read-only `query` isn't called code execution, and fetch/time/memory/Sentry/Drive stay quiet — precision the real-world catalog regression-tests on every commit.
 
 ## CI / GitHub Action
 
