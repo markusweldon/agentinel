@@ -5,8 +5,8 @@
     {
       "tool": {
         "driver": {
-          "name": "trident",
-          "informationUri": "https://github.com/markusweldon/trident",
+          "name": "agentinel",
+          "informationUri": "https://github.com/markusweldon/agentinel",
           "version": "0.1.0",
           "rules": [
             {
@@ -85,7 +85,7 @@
             }
           ],
           "partialFingerprints": {
-            "tridentFinding/v1": "lethal_trifecta:fleet"
+            "agentinelFinding/v1": "lethal_trifecta:fleet"
           },
           "properties": {
             "asi": "ASI02",
@@ -117,7 +117,7 @@
             }
           ],
           "partialFingerprints": {
-            "tridentFinding/v1": "secrets_exposure:server:slack-notifier"
+            "agentinelFinding/v1": "secrets_exposure:server:slack-notifier"
           },
           "properties": {
             "asi": "ASI03",

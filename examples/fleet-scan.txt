@@ -1,19 +1,19 @@
 ╭───────────────────────────────────╮
-│ trident — MCP security scan       │
+│ Agentinel — MCP security scan     │
 │ target:  /tmp/fleet-demo-mcp.json │
 │ server:  ?   tools: 5             │
 ╰───────────────────────────────────╯
-Capability matrix (Rule of Two)                                
-                                                               
-                                 A           B          C      
-  Tool                       untrusted   sensitive   external  
- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 
-  docs-fetcher:fetch_doc         ●           ·          ·      
-  notes-reader:list_files        ·           ·          ·      
-  notes-reader:read_file         ·           ●          ·      
-  docs-fetcher:search_docs       ·           ·          ·      
-  notifier:send_message          ·           ·          ●      
-                                                               
+Capability matrix (Rule of Two)                                   
+                                                                  
+                                    A           B          C      
+  Tool                          untrusted   sensitive   external  
+ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 
+  web-fetcher:fetch_doc             ●           ·          ·      
+  notes-reader:list_files           ·           ●          ·      
+  notes-reader:read_file            ·           ●          ·      
+  web-fetcher:search_docs           ·           ·          ·      
+  slack-notifier:send_message       ·           ·          ●      
+                                                                  
 
                                                                                 
   Severity   OWASP   Class              Target              Title               
@@ -29,9 +29,9 @@ Capability matrix (Rule of Two)
 
 ● HIGH  Cross-server lethal trifecta across connected servers  [fleet]
    No single server is a full trifecta, but the connected fleet combines all 
-three axes. A (untrusted-input): docs-fetcher; B (sensitive-access): 
-notes-reader; C (external-comms): notifier. An agent connected to all of these 
-can be injected through one server and steered to read sensitive data and 
+three axes. A (untrusted-input): web-fetcher; B (sensitive-access): 
+notes-reader; C (external-comms): slack-notifier. An agent connected to all of 
+these can be injected through one server and steered to read sensitive data and 
 exfiltrate it through another.
    evidence: cross-server A+B+C
    fix: Break the trifecta: remove one axis, split capabilities across isolated 

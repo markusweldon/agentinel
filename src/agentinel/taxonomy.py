@@ -1,6 +1,6 @@
 """The taxonomy spine: OWASP Agentic Top 10 (2026), severities, and attack classes.
 
-Every finding trident emits references an :class:`AttackClass`, which carries a default
+Every finding agentinel emits references an :class:`AttackClass`, which carries a default
 :class:`ASICategory` mapping, severity, remediation, and canonical references. Keeping this
 metadata in one place means detectors stay terse and the taxonomy stays consistent.
 
@@ -93,7 +93,7 @@ _ASI_DESCRIPTIONS: dict[ASICategory, str] = {
 
 
 class AttackClass(StrEnum):
-    """Concrete attack techniques trident detects (static) or attempts (dynamic)."""
+    """Concrete attack techniques agentinel detects (static) or attempts (dynamic)."""
 
     TOOL_POISONING = "tool_poisoning"
     RUG_PULL = "rug_pull"

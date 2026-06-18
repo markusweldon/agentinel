@@ -5,8 +5,8 @@
     {
       "tool": {
         "driver": {
-          "name": "trident",
-          "informationUri": "https://github.com/markusweldon/trident",
+          "name": "agentinel",
+          "informationUri": "https://github.com/markusweldon/agentinel",
           "version": "0.1.0",
           "rules": [
             {
@@ -135,7 +135,7 @@
             }
           ],
           "partialFingerprints": {
-            "tridentFinding/v1": "tool_poisoning:acme-devtools:read_notes"
+            "agentinelFinding/v1": "tool_poisoning:acme-devtools:read_notes"
           },
           "properties": {
             "asi": "ASI01",
@@ -167,7 +167,7 @@
             }
           ],
           "partialFingerprints": {
-            "tridentFinding/v1": "tool_poisoning:acme-devtools:read_notes"
+            "agentinelFinding/v1": "tool_poisoning:acme-devtools:read_notes"
           },
           "properties": {
             "asi": "ASI01",
@@ -199,7 +199,7 @@
             }
           ],
           "partialFingerprints": {
-            "tridentFinding/v1": "tool_poisoning:acme-devtools:read_notes"
+            "agentinelFinding/v1": "tool_poisoning:acme-devtools:read_notes"
           },
           "properties": {
             "asi": "ASI01",
@@ -231,7 +231,7 @@
             }
           ],
           "partialFingerprints": {
-            "tridentFinding/v1": "lethal_trifecta:server:acme-devtools"
+            "agentinelFinding/v1": "lethal_trifecta:server:acme-devtools"
           },
           "properties": {
             "asi": "ASI02",
@@ -263,7 +263,7 @@
             }
           ],
           "partialFingerprints": {
-            "tridentFinding/v1": "unsafe_code_execution:acme-devtools:run"
+            "agentinelFinding/v1": "unsafe_code_execution:acme-devtools:run"
           },
           "properties": {
             "asi": "ASI05",
@@ -295,7 +295,7 @@
             }
           ],
           "partialFingerprints": {
-            "tridentFinding/v1": "excessive_permissions:acme-devtools:run"
+            "agentinelFinding/v1": "excessive_permissions:acme-devtools:run"
           },
           "properties": {
             "asi": "ASI03",

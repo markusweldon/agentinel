@@ -81,7 +81,7 @@
         "sensitive_access": true,
         "external_comms": false,
         "rationale": {
-          "B": "matched: read file"
+          "B": "matched: read file, file"
         }
       }
     },
@@ -97,9 +97,11 @@
       "annotations": null,
       "axes": {
         "untrusted_input": false,
-        "sensitive_access": false,
+        "sensitive_access": true,
         "external_comms": false,
-        "rationale": {}
+        "rationale": {
+          "B": "matched: files"
+        }
       }
     },
     {
@@ -167,6 +169,6 @@
     }
   ],
   "probe": null,
-  "generated_at": "2026-06-17 19:23 UTC",
+  "generated_at": "2026-06-18 16:10 UTC",
   "notes": []
 }

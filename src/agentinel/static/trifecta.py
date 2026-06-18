@@ -1,4 +1,4 @@
-"""Lethal Trifecta / Rule-of-Two detection — trident's signature static check.
+"""Lethal Trifecta / Rule-of-Two detection — agentinel's signature static check.
 
 Flags two conditions:
   1. A single tool that itself holds all three dangerous axes (CRITICAL).

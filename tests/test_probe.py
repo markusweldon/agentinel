@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import re
 
-from trident.dynamic import ScriptedChat, run_adaptive_probe
-from trident.dynamic.llm import ChatResponse, ToolCall
-from trident.models import ToolInfo
-from trident.static import classify_tool
-from trident.taxonomy import AttackClass
+from agentinel.dynamic import ScriptedChat, run_adaptive_probe
+from agentinel.dynamic.llm import ChatResponse, ToolCall
+from agentinel.models import ToolInfo
+from agentinel.static import classify_tool
+from agentinel.taxonomy import AttackClass
 
 
 def _tool(name: str, desc: str) -> ToolInfo:

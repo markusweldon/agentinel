@@ -1,4 +1,4 @@
-"""trident command-line interface."""
+"""agentinel command-line interface."""
 
 from __future__ import annotations
 
@@ -149,7 +149,7 @@ def probe(
 
 @app.command()
 def version() -> None:
-    """Print the trident version."""
+    """Print the agentinel version."""
     typer.echo(__version__)
 
 

@@ -6,9 +6,9 @@ import json
 import sys
 from pathlib import Path
 
-from trident.config import parse_config
-from trident.scanner import scan_config
-from trident.taxonomy import AttackClass, Severity
+from agentinel.config import parse_config
+from agentinel.scanner import scan_config
+from agentinel.taxonomy import AttackClass, Severity
 
 _FIXTURES = Path(__file__).resolve().parent.parent / "fixtures"
 _PY = sys.executable

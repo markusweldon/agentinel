@@ -1,7 +1,7 @@
 """An INTENTIONALLY INSECURE MCP server used as a positive test case in the eval corpus.
 
 The tool bodies are harmless stubs — nothing here actually reads secrets or runs commands.
-The risk lives entirely in the tool *metadata* and *capability mix*, which is what trident
+The risk lives entirely in the tool *metadata* and *capability mix*, which is what agentinel
 inspects statically:
 
   - `read_notes`  : description carries hidden directive tags + concealment instructions (poisoning)

@@ -93,7 +93,7 @@ def render_report(
 
     tgt = report.target
     header = Text()
-    header.append("trident", style="bold")
+    header.append("Agentinel", style="bold")
     header.append(" — MCP security scan\n")
     header.append(f"target:  {tgt.label}\n", style="dim")
     header.append(f"server:  {tgt.server_name or '?'}   tools: {len(report.tools)}", style="dim")

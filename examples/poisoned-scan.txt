@@ -1,5 +1,5 @@
 ╭───────────────────────────────────╮
-│ trident — MCP security scan       │
+│ Agentinel — MCP security scan     │
 │ target:  acme-devtools            │
 │ server:  acme-devtools   tools: 4 │
 ╰───────────────────────────────────╯

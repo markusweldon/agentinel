@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from trident.models import CapabilityAxes, Finding, Report, TargetInfo, ToolInfo
-from trident.report.html import to_html
-from trident.taxonomy import AttackClass
+from agentinel.models import CapabilityAxes, Finding, Report, TargetInfo, ToolInfo
+from agentinel.report.html import to_html
+from agentinel.taxonomy import AttackClass
 
 
 def test_html_renders_and_escapes_injected_text():

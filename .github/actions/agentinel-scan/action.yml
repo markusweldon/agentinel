@@ -1,4 +1,4 @@
-name: "trident MCP scan"
+name: "agentinel MCP scan"
 description: "Statically scan an MCP server for OWASP Agentic Top 10 risks and upload SARIF."
 branding:
   icon: shield
@@ -18,9 +18,9 @@ inputs:
   sarif:
     description: "Path to write the SARIF report."
     required: false
-    default: "trident.sarif"
+    default: "agentinel.sarif"
   ref:
-    description: "trident git ref to install."
+    description: "agentinel git ref to install."
     required: false
     default: "main"
 
@@ -29,16 +29,16 @@ runs:
   steps:
     - name: Install uv
       uses: astral-sh/setup-uv@v5
-    - name: Run trident scan
+    - name: Run agentinel scan
       shell: bash
       run: |
         set -euo pipefail
-        SRC="git+https://github.com/markusweldon/trident@${{ inputs.ref }}"
+        SRC="git+https://github.com/markusweldon/agentinel@${{ inputs.ref }}"
         if [ -n "${{ inputs.stdio }}" ]; then
-          uvx --from "$SRC" trident scan --stdio "${{ inputs.stdio }}" \
+          uvx --from "$SRC" agentinel scan --stdio "${{ inputs.stdio }}" \
             --fail-on "${{ inputs.fail-on }}" --sarif "${{ inputs.sarif }}"
         elif [ -n "${{ inputs.http }}" ]; then
-          uvx --from "$SRC" trident scan --http "${{ inputs.http }}" \
+          uvx --from "$SRC" agentinel scan --http "${{ inputs.http }}" \
             --fail-on "${{ inputs.fail-on }}" --sarif "${{ inputs.sarif }}"
         else
           echo "::error::provide either 'stdio' or 'http' input"; exit 2

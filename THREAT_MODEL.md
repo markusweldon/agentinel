@@ -1,16 +1,16 @@
 # Threat model
 
-trident assesses the security of an **MCP server and the agent that connects to it**. This document records the trust boundaries, the attack classes trident detects, and how each maps to the OWASP Top 10 for Agentic Applications (2026).
+agentinel assesses the security of an **MCP server and the agent that connects to it**. This document records the trust boundaries, the attack classes agentinel detects, and how each maps to the OWASP Top 10 for Agentic Applications (2026).
 
 ## Trust model
 
 - **Untrusted:** everything the server declares — tool names, descriptions, parameter docs, JSON schemas, tool annotations (`readOnlyHint`, etc.), server instructions, and any content returned by a tool. All of it reaches the model and can carry instructions.
 - **Assumption:** the agent is a capable LLM that follows instructions found in tool metadata and tool output unless specifically defended. This is the realistic 2026 baseline.
-- **Out of scope (v1):** network/transport security, server-side RCE in the server's own implementation, and multi-agent (A2A) topologies. trident reasons about what the *agent* can be made to do, not the server's internal bugs.
+- **Out of scope (v1):** network/transport security, server-side RCE in the server's own implementation, and multi-agent (A2A) topologies. agentinel reasons about what the *agent* can be made to do, not the server's internal bugs.
 
 ## Attack classes → OWASP ASI
 
-| Attack class | What trident looks for | Detection | OWASP ASI |
+| Attack class | What agentinel looks for | Detection | OWASP ASI |
 |---|---|---|---|
 | Tool poisoning | Hidden instructions in tool/param descriptions or server instructions: invisible/bidi Unicode, instruction-override and concealment phrasing, references to credential files | static | ASI01 |
 | Prompt injection (live) | Agent steered off-task by an adaptive injection | dynamic probe | ASI01 |
@@ -31,7 +31,7 @@ Each tool is assigned to zero or more axes:
 - **B — sensitive access:** reads files, databases, secrets, cloud, customer/PII data.
 - **C — external comms / state change:** sends, posts, writes, deploys, executes; or `destructiveHint=true` / `readOnlyHint=false`.
 
-Holding **all three** is the Lethal Trifecta — a single injection can read sensitive data and send it out. trident reports a single tool spanning A+B+C as CRITICAL, the server-aggregate trifecta as HIGH, and a two-of-three toolset as an INFO "one capability away" note. Annotations only ever *raise* an axis, never clear one, because the server controls them.
+Holding **all three** is the Lethal Trifecta — a single injection can read sensitive data and send it out. agentinel reports a single tool spanning A+B+C as CRITICAL, the server-aggregate trifecta as HIGH, and a two-of-three toolset as an INFO "one capability away" note. Annotations only ever *raise* an axis, never clear one, because the server controls them.
 
 ## Dynamic probe threat model
 

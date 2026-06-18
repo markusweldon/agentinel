@@ -1,6 +1,6 @@
 """Self-eval: run the scanner against the labeled fixture corpus and measure precision/recall.
 
-This is trident eating its own dog food — the corpus is ground truth, and we assert the static
+This is agentinel eating its own dog food — the corpus is ground truth, and we assert the static
 engine recovers every expected attack class with zero false positives on the clean controls.
 Run with ``-s`` to see the printed metrics.
 """
@@ -12,8 +12,8 @@ from pathlib import Path
 
 import pytest
 
-from trident.scanner import scan_stdio
-from trident.taxonomy import AttackClass, Severity
+from agentinel.scanner import scan_stdio
+from agentinel.taxonomy import AttackClass, Severity
 
 _FIXTURES = Path(__file__).resolve().parent.parent / "fixtures"
 

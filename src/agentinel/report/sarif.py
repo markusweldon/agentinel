@@ -23,7 +23,7 @@ _SECURITY_SEVERITY = {
     Severity.INFO: "1.0",
 }
 
-INFO_URI = "https://github.com/markusweldon/trident"
+INFO_URI = "https://github.com/markusweldon/agentinel"
 
 
 def _rule(attack_class: AttackClass) -> dict:
@@ -63,7 +63,7 @@ def to_sarif(report: Report, *, artifact_uri: str = "mcp-server") -> dict:
                         "logicalLocations": [{"fullyQualifiedName": f.target, "kind": "resource"}],
                     }
                 ],
-                "partialFingerprints": {"tridentFinding/v1": f"{f.attack_class.value}:{f.target}"},
+                "partialFingerprints": {"agentinelFinding/v1": f"{f.attack_class.value}:{f.target}"},
                 "properties": {
                     "asi": f.asi.value,
                     "confidence": f.confidence,
@@ -81,7 +81,7 @@ def to_sarif(report: Report, *, artifact_uri: str = "mcp-server") -> dict:
             {
                 "tool": {
                     "driver": {
-                        "name": "trident",
+                        "name": "agentinel",
                         "informationUri": INFO_URI,
                         "version": __version__,
                         "rules": rules,

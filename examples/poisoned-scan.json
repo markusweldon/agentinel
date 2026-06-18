@@ -56,7 +56,7 @@
         "sensitive_access": true,
         "external_comms": false,
         "rationale": {
-          "B": "matched: ssh, id rsa"
+          "B": "matched: ssh, id rsa, file"
         }
       }
     },
@@ -211,6 +211,6 @@
     }
   ],
   "probe": null,
-  "generated_at": "2026-06-17 19:20 UTC",
+  "generated_at": "2026-06-18 16:10 UTC",
   "notes": []
 }

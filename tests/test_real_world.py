@@ -1,6 +1,6 @@
 """Real-world eval: scan the published tool specs of popular MCP servers (never executed).
 
-These tool definitions were copied from each server's own docs, so they are ground truth trident
+These tool definitions were copied from each server's own docs, so they are ground truth agentinel
 did not author — the real test of whether the detectors generalize beyond the hand-built fixtures.
 """
 
@@ -9,10 +9,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from trident.mcp_client import ServerSnapshot
-from trident.models import ToolInfo
-from trident.scanner import analyze
-from trident.taxonomy import AttackClass, Severity
+from agentinel.mcp_client import ServerSnapshot
+from agentinel.models import ToolInfo
+from agentinel.scanner import analyze
+from agentinel.taxonomy import AttackClass, Severity
 
 _CATALOG = json.loads(
     (Path(__file__).resolve().parent.parent / "fixtures" / "real-world" / "catalog.json").read_text()

@@ -1,5 +1,5 @@
 {
-  "_note": "Tool definitions copied from the published specs of popular MCP servers (no code is executed). Used to validate trident against real-world tool metadata rather than only its own fixtures.",
+  "_note": "Tool definitions copied from the published specs of popular MCP servers (no code is executed). Used to validate agentinel against real-world tool metadata rather than only its own fixtures.",
   "github": [
     {"name": "issue_read", "description": "Fetch issue details, comments, sub-issues, and labels"},
     {"name": "list_issues", "description": "List issues in a repository with filtering and sorting"},

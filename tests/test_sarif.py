@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from trident.models import Finding, Report, TargetInfo
-from trident.report.sarif import to_sarif
-from trident.taxonomy import AttackClass
+from agentinel.models import Finding, Report, TargetInfo
+from agentinel.report.sarif import to_sarif
+from agentinel.taxonomy import AttackClass
 
 _VALID_LEVELS = {"error", "warning", "note", "none"}
 
@@ -19,7 +19,7 @@ def test_sarif_document_structure():
 
     assert doc["version"] == "2.1.0"
     driver = doc["runs"][0]["tool"]["driver"]
-    assert driver["name"] == "trident"
+    assert driver["name"] == "agentinel"
     assert {r["id"] for r in driver["rules"]} == {"lethal_trifecta", "tool_poisoning"}
 
     results = doc["runs"][0]["results"]

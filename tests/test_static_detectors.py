@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from trident.mcp_client import ServerSnapshot
-from trident.models import ToolInfo
-from trident.scanner import analyze
-from trident.static.shadowing import check_shadowing
-from trident.taxonomy import AttackClass, Severity
+from agentinel.mcp_client import ServerSnapshot
+from agentinel.models import ToolInfo
+from agentinel.scanner import analyze
+from agentinel.static.shadowing import check_shadowing
+from agentinel.taxonomy import AttackClass, Severity
 
 
 def _tool(name, desc="", schema=None, annotations=None, server="srv"):
