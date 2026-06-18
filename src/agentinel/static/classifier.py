@@ -54,21 +54,45 @@ _A_TERMS = [
     "search web",
     "untrusted",
     "third party",
+]
+
+# Content nouns that imply ingesting untrusted / user-generated content — but only counted as
+# untrusted-input when paired with a read verb, so create_issue / post_comment aren't mis-flagged.
+_A_CONTENT = [
     "issue",
     "issues",
     "pull request",
     "pull requests",
+    "merge request",
+    "merge requests",
     "discussion",
     "discussions",
     "comment",
     "comments",
     "gist",
+    "gists",
     "notification",
     "notifications",
     "review",
     "reviews",
     "thread",
+    "threads",
+    "channel history",
+    "message history",
+]
+
+_READ_VERBS = [
+    "read",
+    "get",
+    "list",
+    "search",
+    "fetch",
+    "retrieve",
+    "show",
+    "view",
     "history",
+    "replies",
+    "details",
 ]
 
 # B — reaches sensitive data or systems.
@@ -196,6 +220,10 @@ def classify_tool(tool: ToolInfo) -> CapabilityAxes:
     ann = tool.annotations or {}
 
     a_hits = _matches(hay, _A_TERMS)
+    # Content nouns (issue, comment, merge request, …) imply untrusted-input only when *read*,
+    # so create_issue / post_comment aren't mis-flagged as ingesting untrusted content.
+    if _matches(hay, _READ_VERBS):
+        a_hits = a_hits + _matches(hay, _A_CONTENT)
     b_hits = _matches(hay, _B_TERMS)
     c_hits = _matches(hay, _C_TERMS)
 

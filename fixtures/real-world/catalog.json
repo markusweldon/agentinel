@@ -71,5 +71,20 @@
   ],
   "postgres": [
     {"name": "query", "description": "Execute read-only SQL queries against the connected database"}
+  ],
+  "gitlab": [
+    {"name": "get_file_contents", "description": "Get the contents of a file or directory from a project"},
+    {"name": "search_repositories", "description": "Search for GitLab projects"},
+    {"name": "create_or_update_file", "description": "Create or update a single file in a project"},
+    {"name": "push_files", "description": "Push multiple files in a single commit"},
+    {"name": "create_issue", "description": "Create a new issue in a project"},
+    {"name": "create_merge_request", "description": "Create a new merge request"},
+    {"name": "create_branch", "description": "Create a new branch"}
+  ],
+  "sentry": [
+    {"name": "get_sentry_issue", "description": "Retrieve and analyze a Sentry issue by ID or URL, including the full stacktrace"}
+  ],
+  "gdrive": [
+    {"name": "search", "description": "Search for files in Google Drive by query, returning names and MIME types"}
   ]
 }

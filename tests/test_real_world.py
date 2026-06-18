@@ -30,7 +30,7 @@ def test_github_server_is_a_full_trifecta():
 
 
 def test_benign_servers_have_no_actionable_findings():
-    for server in ("fetch", "time", "memory", "postgres"):
+    for server in ("fetch", "time", "memory", "postgres", "sentry", "gdrive"):
         actionable = [f for f in _findings(server) if f.severity.rank >= Severity.LOW.rank]
         assert not actionable, f"{server}: {[f.attack_class.value for f in actionable]}"
 
@@ -46,6 +46,8 @@ def test_puppeteer_js_eval_flagged_as_code_execution():
 
 
 def test_near_trifecta_servers_are_info_not_high():
-    for server in ("filesystem", "git", "slack"):
+    # gitlab is write-focused (no untrusted-content reads), so it must be near-trifecta, NOT a full
+    # trifecta — a regression guard for the create_issue-was-mis-flagged-as-untrusted-input fix.
+    for server in ("filesystem", "git", "slack", "gitlab"):
         tri = [f for f in _findings(server) if f.attack_class is AttackClass.LETHAL_TRIFECTA]
         assert tri and all(f.severity is Severity.INFO for f in tri), server
