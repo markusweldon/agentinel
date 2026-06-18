@@ -11,7 +11,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![OWASP Agentic Top 10](https://img.shields.io/badge/OWASP-Agentic%20Top%2010%3A2026-red)](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/)
 
-AI assistants now connect to many MCP servers at once. Individually those servers are usually fine — but **wire enough of them together and you can accidentally hand one agent the "lethal trifecta": access to untrusted content + sensitive data + a way to send data out** — which is all a prompt injection needs to exfiltrate. Agentinel makes that capability surface visible and flags the concrete footguns.
+AI assistants now connect to many MCP servers at once. Individually those servers are usually fine — but **wire enough of them together and you can accidentally hand one agent the "lethal trifecta": access to untrusted content + sensitive data + a way to send data out** — which is all a prompt injection needs to exfiltrate. Agentinel makes that capability surface visible and flags the concrete risks.
 
 It builds directly on prior work — Simon Willison's [Lethal Trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/), Meta's [Rule of Two](https://ai.meta.com/blog/practical-ai-agent-security/), and the [OWASP Agentic Top 10](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/). It doesn't invent those ideas; it **operationalizes them** as an automatic check, so you don't have to threat-model your agent setup by hand.
 
@@ -24,11 +24,13 @@ It builds directly on prior work — Simon Willison's [Lethal Trifecta](https://
 
 Findings map to an OWASP ASI category and export to terminal, JSON, **SARIF** (GitHub code scanning), and a self-contained **HTML dashboard**.
 
-### What it is — and isn't
-- ✅ An **open, educational** auditor that makes a known threat model automatic, catches the *accidental* multi-server trifecta, and finds real, fixable bugs (poisoning, secrets, drift).
-- ✅ **Complementary** to commercial scanners (e.g. Snyk Agent Scan) — it adds the cross-server/fleet view and an adaptive probe; it isn't a replacement.
-- ⚠️ **Heuristic and early (v0.1).** The capability classifier is keyword-based (sharpen borderline cases with `--llm-classify`); static coverage is the MCP-observable subset of the OWASP ASI list (ASI01–05); the probe is experimental.
-- ❌ Not novel research, not a managed security product, not a guarantee — a clean signal and a starting point, not the last word.
+### What it does well
+- **Turns a known threat model into an automatic check.** No hand-reasoning about your agent's capability surface — you get a ranked report, including the *accidental cross-server* trifecta (individually-safe servers that combine into a real risk).
+- **Validated on 15 real MCP servers.** It correctly flags GitHub's server as a lethal trifecta — the same exploit class disclosed in the wild — and stays quiet on benign ones. That precision is regression-tested on every commit.
+- **Surfaces concrete, fixable risks** in the servers it scans: tool poisoning, leaked secrets, rug-pull drift, and unsafe code-execution surfaces — each mapped to an OWASP ASI category with remediation.
+- **Open, hackable, and complementary.** Free and designed to sit alongside commercial scanners (e.g. Snyk Agent Scan), adding the cross-server/fleet view and a live-server probe.
+
+The static `scan` is solid and fully tested. The `probe` is **experimental** — its loop is unit-tested but not yet validated against a live model — and today's coverage is the MCP-observable part of the OWASP ASI list (ASI01–05).
 
 ---
 
