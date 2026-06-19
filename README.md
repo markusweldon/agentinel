@@ -28,7 +28,7 @@ Findings map to an OWASP ASI category and export to terminal, JSON, **SARIF** (G
 - **Turns a known threat model into an automatic check.** No hand-reasoning about your agent's capability surface — you get a ranked report, including the *accidental cross-server* trifecta (individually-safe servers that combine into a real risk).
 - **Validated on 15 real MCP servers.** It correctly flags GitHub's server as a lethal trifecta — the same exploit class disclosed in the wild — and stays quiet on benign ones. That precision is regression-tested on every commit.
 - **Surfaces concrete, fixable risks** in the servers it scans: tool poisoning, leaked secrets, rug-pull drift, and unsafe code-execution surfaces — each mapped to an OWASP ASI category with remediation.
-- **Open, hackable, and complementary.** Free and designed to sit alongside commercial scanners (e.g. Snyk Agent Scan), adding the cross-server/fleet view and a live-server probe.
+- **Open and reproducible.** Free to run, read, and extend — the cross-server/fleet view and the adaptive live-server probe are open for anyone to study, reproduce, and build on.
 
 The static `scan` is solid and fully tested. The `probe` is **experimental** — its loop is unit-tested but not yet validated against a live model — and today's coverage is the MCP-observable part of the OWASP ASI list (ASI01–05).
 
@@ -64,7 +64,7 @@ Capability matrix (Rule of Two)
 
 Add `--html report.html` for the dashboard pictured at the top of this README, or `--sarif findings.sarif` for GitHub's Security tab. Sample reports live in [`examples/`](examples/).
 
-> **Viewing the dashboard.** GitHub can't render a committed `.html` inline, so the SVG banner above is the in-page preview. For the real interactive dashboard: open `examples/fleet-scan.html` locally, or — once this repo is public — use the [live HTML preview](https://htmlpreview.github.io/?https://raw.githubusercontent.com/markusweldon/agentinel/main/examples/fleet-scan.html) or the GitHub Pages deployment. (Drop a PNG at `docs/dashboard.png` and it renders inline anywhere.)
+> **Viewing the dashboard.** GitHub can't render a committed `.html` inline, so the SVG banner above is the in-page preview. **The interactive dashboards are live at [markusweldon.github.io/agentinel](https://markusweldon.github.io/agentinel/)** — or open `examples/fleet-scan.html` locally.
 
 ## Scan your own setup
 
@@ -79,14 +79,14 @@ uv run agentinel scan --config "$HOME/Library/Application Support/Claude/claude_
 
 ---
 
-## Where it fits
+## What this explores
 
-Agentinel is **open and educational**, focused on two things that are easy to miss in a busy agent setup:
+Agentinel is an **open research project** into making agent/MCP risk *visible and automatic*. It focuses on two things that are easy to miss in a busy agent setup:
 
 - the **accidental cross-server trifecta** — individually-safe servers that combine into a real exfiltration path; and
 - an **adaptive probe aimed at the MCP tool surface** itself, not just the model endpoint.
 
-It's built to **complement** the agent-security tooling teams already run and the "secure at inception" mindset — surfacing dangerous capability combinations and risky tool metadata early, in a form anyone can read, run, and extend.
+Everything here is open and reproducible: read the detectors, run them against real servers, and extend the taxonomy. It's a starting point for reasoning about agent capability surfaces — not a finished verdict.
 
 ## How the signature checks work
 
@@ -137,7 +137,7 @@ That proves the detectors don't regress — but it's Agentinel grading its own h
 | memory | C | ✅ clean |
 | time | — | ✅ clean |
 
-The GitHub verdict matches the real [GitHub MCP exploit](https://invariantlabs.ai/blog/mcp-github-vulnerability) Invariant Labs disclosed. Just as important is what Agentinel *doesn't* flag: GitLab (write-focused) is near-trifecta not full, Postgres's read-only `query` isn't called code execution, and fetch/time/memory/Sentry/Drive stay quiet — precision the real-world catalog regression-tests on every commit.
+The GitHub verdict matches a [real-world GitHub MCP exploit disclosed in the wild](https://invariantlabs.ai/blog/mcp-github-vulnerability). Just as important is what Agentinel *doesn't* flag: GitLab (write-focused) is near-trifecta not full, Postgres's read-only `query` isn't called code execution, and fetch/time/memory/Sentry/Drive stay quiet — precision the real-world catalog regression-tests on every commit.
 
 ## CI / GitHub Action
 
