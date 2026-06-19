@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>agentinel — docs-fetcher</title>
+<style>
+  :root{ color-scheme:dark; --bg:#0a0e14; --card:#121821; --card2:#0f141c; --bd:#1f2a37; --tx:#d7e0ea; --mut:#8b97a7; --accent:#22d3ee; --violet:#a78bfa; }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 70% -10%, #15202e 0%, var(--bg) 55%);color:var(--tx);
+       font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1040px;margin:0 auto;padding:36px 24px 64px}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+  .logo{color:var(--accent);filter:drop-shadow(0 0 10px rgba(34,211,238,.35))}
+  h1{font-size:24px;margin:0;letter-spacing:.3px;font-weight:700}
+  h1 .v{color:var(--mut);font-weight:500;font-size:13px;margin-left:8px}
+  .tag{color:var(--mut);margin:2px 0 22px;font-size:14px}
+  .meta{color:var(--mut);font-size:13px;margin-bottom:22px}
+  .meta b{color:var(--tx);font-weight:600}
+  .meta code{background:var(--card2);border:1px solid var(--bd);border-radius:5px;padding:1px 6px;font-size:12px}
+  .note{color:#fbbf24;font-size:13px;margin:4px 0}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin:0 0 18px}
+  .kpi{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px 16px}
+  .kpi .n{font-size:26px;font-weight:700;line-height:1}
+  .kpi .l{color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-top:6px}
+  .bar{display:flex;height:10px;border-radius:6px;overflow:hidden;margin:6px 0 26px;background:var(--card2);border:1px solid var(--bd)}
+  .bar span{display:block;height:100%}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--mut);margin:28px 0 10px;font-weight:600}
+  .panel{background:var(--card);border:1px solid var(--bd);border-radius:12px;overflow:hidden}
+  table{width:100%;border-collapse:collapse}
+  th,td{text-align:left;padding:9px 14px;border-bottom:1px solid var(--bd);font-size:14px}
+  th{color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+  tbody tr:last-child td{border-bottom:none}
+  .srv{color:var(--violet);font-weight:600}
+  .dot{font-size:15px} .on{color:var(--accent)} .off{color:#334155}
+  tr.tri td{background:rgba(255,77,79,.10)}
+  tr.tri .badge-tri{background:#ff4d4f;color:#0a0e14;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:8px}
+  .card{background:var(--card);border:1px solid var(--bd);border-left-width:4px;border-radius:10px;padding:14px 16px;margin:11px 0}
+  .card .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .pill{font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;color:#0a0e14}
+  .chip{font-size:11px;color:var(--mut);border:1px solid var(--bd);border-radius:20px;padding:2px 9px}
+  .card h3{margin:0;font-size:15px;font-weight:600;flex:1}
+  .tgt{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--mut)}
+  .card p{margin:9px 0 0;color:#c4cedb}
+  .ev{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--mut);background:var(--card2);
+      border:1px solid var(--bd);border-radius:6px;padding:7px 10px;margin-top:9px;word-break:break-word}
+  .fix{color:#34d399;margin-top:9px}
+  .asi{color:var(--mut);font-size:12px;margin-top:9px}
+  .conf{display:inline-block;width:64px;height:6px;border-radius:3px;background:#243042;vertical-align:middle;margin-left:6px;overflow:hidden}
+  .conf>span{display:block;height:100%;background:var(--accent)}
+  .probe .top{display:flex;gap:10px;align-items:center}
+  .ok{color:#34d399} .bad{color:#ff4d4f;font-weight:700}
+  .allclear{background:var(--card);border:1px solid #14532d;border-radius:12px;padding:22px;color:#34d399;font-weight:600}
+  footer{color:var(--mut);font-size:12px;margin-top:36px;border-top:1px solid var(--bd);padding-top:14px}
+  a{color:var(--accent);text-decoration:none}
+</style></head><body><div class="wrap">
+
+  <header>
+    <svg class="logo" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.8" stroke-linejoin="round">
+      <path d="M12 2 L21 5.4 V11.5 C21 17 17 20.6 12 22.5 C7 20.6 3 17 3 11.5 V5.4 Z"/>
+      <path d="M5.5 12 C8 8.8 16 8.8 18.5 12 C16 15.2 8 15.2 5.5 12 Z"/>
+      <circle cx="12" cy="12" r="2.3" fill="currentColor" stroke="none"/>
+    </svg>
+    <h1>Agentinel<span class="v">v0.1.0</span></h1>
+  </header>
+  <div class="tag">MCP security scorecard — OWASP Agentic Top 10 (2026)</div>
+
+  <div class="meta">
+    target <code>docs-fetcher</code> &nbsp;·&nbsp; <b>1</b> server
+    &nbsp;·&nbsp; <b>2</b> tools &nbsp;·&nbsp; 2026-06-19 03:57 UTC
+  </div>
+  
+
+  <div class="kpis">
+    <div class="kpi"><div class="n">0</div><div class="l">Findings</div></div>
+    <div class="kpi"><div class="n" style="color:#34d399">—</div><div class="l">Max severity</div></div>
+    <div class="kpi"><div class="n" style="color:#ff4d4f">0</div><div class="l">Critical</div></div><div class="kpi"><div class="n" style="color:#ff7a45">0</div><div class="l">High</div></div><div class="kpi"><div class="n" style="color:#fbbf24">0</div><div class="l">Medium</div></div>
+  </div>
+  
+
+  
+  <h2>Capability matrix · Rule of Two</h2>
+  <div class="panel"><table>
+    <thead><tr><th>Server / tool</th><th>A&nbsp;untrusted</th><th>B&nbsp;sensitive</th><th>C&nbsp;external</th></tr></thead>
+    <tbody>
+    
+      
+      <tr class="">
+        <td><span class="srv">docs-fetcher</span> / fetch_doc</td>
+        <td class="dot on">●</td>
+        <td class="dot off">·</td>
+        <td class="dot off">·</td>
+      </tr>
+      
+      <tr class="">
+        <td><span style="color:#3a4760">↳</span> search_docs</td>
+        <td class="dot off">·</td>
+        <td class="dot off">·</td>
+        <td class="dot off">·</td>
+      </tr>
+      
+    
+    </tbody>
+  </table></div>
+  
+
+  
+
+  
+  <div class="allclear">✓ No findings — this target passed every agentinel check.</div>
+  
+
+  <footer>Generated by <a href="https://github.com/markusweldon/agentinel">agentinel</a> ·
+    mapped to the <a href="https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/">OWASP Top 10 for Agentic Applications (2026)</a></footer>
+</div></body></html>
