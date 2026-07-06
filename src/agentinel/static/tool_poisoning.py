@@ -21,9 +21,20 @@ from ..models import Finding
 from ..taxonomy import AttackClass, Severity
 
 # Zero-width, bidi-override, word-joiner, BOM, and Unicode tag characters (ASCII smuggling).
-_INVISIBLE_RE = re.compile("[​-‏‪-‮⁠-⁤⁪-⁯﻿￹-￻]|[\U000e0000-\U000e007f]")
+# NOTE: U+200D (ZERO WIDTH JOINER) is deliberately EXCLUDED — it is required inside legitimate
+# emoji sequences (👩‍💻, 🏳️‍🌈), so flagging it produces false positives on friendly descriptions.
+_INVISIBLE_RE = re.compile(
+    "[​‌‎‏"  # ZWSP, ZWNJ, LTR/RTL marks (NOT U+200D ZWJ)
+    "‪-‮"  # bidi embeddings / overrides
+    "⁠-⁤"  # word joiner + invisible math operators
+    "⁪-⁯"  # deprecated format controls
+    "﻿￹-￻]"  # BOM / interlinear annotation
+    "|[\U000e0000-\U000e007f]"  # Unicode tag block
+)
 
-# (pattern, human label, confidence)
+# (pattern, human label, confidence). Patterns require an adversarial object/adverb so that
+# ordinary tool docs ("Before using this tool, authenticate.", "You must always pass an id.")
+# do not trip them — only genuinely coercive/concealing phrasing does.
 _INJECTION_PATTERNS: list[tuple[str, str, float]] = [
     (
         r"ignore (all |the )?(previous|above|prior|earlier) (instruction|context|message|prompt)",
@@ -33,11 +44,25 @@ _INJECTION_PATTERNS: list[tuple[str, str, float]] = [
     (r"disregard (all |the )?(previous|above|prior|earlier)", "instruction override", 0.85),
     (r"do not (tell|inform|notify|mention|reveal|disclose)[^.]{0,30}\buser\b", "concealment from the user", 0.9),
     (r"without (telling|informing|notifying|alerting) the user", "concealment from the user", 0.9),
-    (r"before (using|calling|invoking|doing|running) (this|any|anything)", "preconditioned hidden action", 0.7),
-    (r"you (must|should|need to) (always|first|secretly|silently)", "coerced behavior", 0.75),
-    (r"always (read|send|include|append|forward|call|attach)", "coerced exfiltration/behavior", 0.7),
+    (r"you (must|should|always) (secretly|silently|covertly|quietly)", "coerced covert behavior", 0.85),
+    (
+        r"(secretly|silently|covertly|quietly) (read|send|forward|copy|append|include|call|attach|email)",
+        "covert exfiltration",
+        0.85,
+    ),
+    (
+        r"always (send|forward|exfiltrate|leak|email|post|copy|append)[^.]{0,40}"
+        r"(secret|credential|token|api key|password|\.env|http|webhook|@)",
+        "coerced exfiltration",
+        0.8,
+    ),
+    (
+        r"(reveal|print|show|leak|repeat|ignore|override|dump)[^.]{0,20}"
+        r"(system prompt|developer message|system message)",
+        "system-prompt exfiltration",
+        0.8,
+    ),
     (r"<\s*(important|secret|system|admin|instruction)s?\s*>", "hidden directive tags", 0.85),
-    (r"\b(system prompt|developer message)\b", "system-prompt reference", 0.5),
     (r"\b(as an ai|you are now|new instructions?)\b", "role override", 0.6),
 ]
 
