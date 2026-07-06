@@ -95,6 +95,31 @@ _READ_VERBS = [
     "details",
 ]
 
+# Verbs that mark a tool as primarily a *writer*. Used to keep content nouns (issue, comment)
+# from counting as untrusted-input on write tools like create_issue / post_comment, even when
+# the description also mentions a read verb ("...returns the created issue so you can view it").
+_WRITE_VERBS = [
+    "create",
+    "post",
+    "update",
+    "delete",
+    "remove",
+    "write",
+    "add",
+    "send",
+    "set",
+    "put",
+    "patch",
+    "publish",
+    "edit",
+    "upload",
+    "insert",
+    "modify",
+    "reply",
+    "merge",
+    "push",
+]
+
 # B — reaches sensitive data or systems.
 _B_TERMS = [
     "secret",
@@ -126,8 +151,6 @@ _B_TERMS = [
     "kube",
     "private repo",
     "contacts",
-    "calendar",
-    "customer",
     "personal data",
     "pii",
     "payment",
@@ -183,7 +206,8 @@ _C_TERMS = [
 
 def _normalize(text: str) -> str:
     """Lower-case, split camelCase, and turn separators into spaces for robust matching."""
-    text = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", text)
+    # Split camelCase, and also acronym→word boundaries so "getAPIKey" → "get API Key" (not "get apikey").
+    text = re.sub(r"(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])", " ", text)
     text = re.sub(r"[_\-./]+", " ", text)
     return re.sub(r"\s+", " ", text).strip().lower()
 
@@ -192,7 +216,7 @@ def _matches(haystack: str, terms: list[str]) -> list[str]:
     """Return the terms that appear in ``haystack`` on token boundaries (avoids 'curl'~'url')."""
     hits: list[str] = []
     for term in terms:
-        if re.search(rf"(?<![a-z]){re.escape(term)}(?![a-z])", haystack):
+        if re.search(rf"(?<![a-z0-9]){re.escape(term)}(?![a-z0-9])", haystack):
             hits.append(term)
     return hits
 
@@ -223,9 +247,11 @@ def classify_tool(tool: ToolInfo) -> CapabilityAxes:
     ann = tool.annotations or {}
 
     a_hits = _matches(hay, _A_TERMS)
-    # Content nouns (issue, comment, merge request, …) imply untrusted-input only when *read*,
-    # so create_issue / post_comment aren't mis-flagged as ingesting untrusted content.
-    if _matches(hay, _READ_VERBS):
+    # Content nouns (issue, comment, merge request, …) imply untrusted-input only when the tool
+    # *reads* them. Require a read verb AND a tool name that isn't primarily a writer — otherwise
+    # create_issue ("…returns the created issue so you can view it") is mis-flagged as A.
+    name_is_write = bool(_matches(_normalize(tool.name or ""), _WRITE_VERBS))
+    if _matches(hay, _READ_VERBS) and not name_is_write:
         a_hits = a_hits + _matches(hay, _A_CONTENT)
     b_hits = _matches(hay, _B_TERMS)
     c_hits = _matches(hay, _C_TERMS)
