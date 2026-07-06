@@ -30,7 +30,7 @@ Findings map to an OWASP ASI category and export to terminal, JSON, **SARIF** (G
 - **Surfaces concrete, fixable risks** in the servers it scans: tool poisoning, leaked secrets, rug-pull drift, and unsafe code-execution surfaces — each mapped to an OWASP ASI category with remediation.
 - **Open and reproducible.** Free to run, read, and extend — the cross-server/fleet view and the adaptive live-server probe are open for anyone to study, reproduce, and build on.
 
-The static `scan` is solid and fully tested. The `probe` is **experimental** — its loop is unit-tested but not yet validated against a live model — and today's coverage is the MCP-observable part of the OWASP ASI list (ASI01–05).
+The static `scan` covers the MCP-observable ASI categories (ASI01–05) and is fully tested. The `probe` is **experimental** — its loop is unit-tested but not yet validated against a live model — and it exercises ASI01–02 (goal hijack and canary exfiltration).
 
 ---
 
@@ -105,7 +105,7 @@ Everything here is open and reproducible: read the detectors, run them against r
 | ASI05 | Unexpected Code Execution | unsafe code/command-execution surface |
 | ASI06–ASI10 | Memory poisoning · inter-agent comms · cascading failures · trust exploitation · rogue agents | roadmap |
 
-v1 focuses on what is observable from MCP servers; multi-agent categories (ASI07–ASI10) are on the roadmap. See [THREAT_MODEL.md](THREAT_MODEL.md) for the full attack-class → ASI mapping.
+v0.1 focuses on what is observable from MCP servers; the remaining categories (ASI06–ASI10) are on the roadmap. See [THREAT_MODEL.md](THREAT_MODEL.md) for the full attack-class → ASI mapping.
 
 ## Evaluation
 
