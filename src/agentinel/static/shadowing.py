@@ -10,17 +10,24 @@ from ..models import Finding
 from ..taxonomy import AttackClass, Severity
 from .classifier import _matches, _normalize
 
+# Phrasing that suggests one tool is trying to hijack calls meant for another. Kept deliberately
+# adversarial — bare "ignore" and "when the user" matched ordinary descriptions, so they were removed.
 _MANIP_VERBS = [
     r"instead of",
     r"override",
     r"redirect",
-    r"when (the )?user",
+    r"reroute",
     r"before calling",
     r"also call",
-    r"reroute",
     r"bypass",
-    r"ignore",
+    r"ignore (the )?(previous|other|above|prior)",
 ]
+
+# Generic tool names too common to treat as a meaningful cross-reference.
+_GENERIC_NAMES = {
+    "get", "list", "search", "run", "read", "write", "create", "update", "delete",
+    "fetch", "send", "post", "query", "call", "exec", "find", "add", "remove", "echo",
+}
 
 
 def check_shadowing(snapshots: list[ServerSnapshot]) -> list[Finding]:
@@ -55,7 +62,14 @@ def check_shadowing(snapshots: list[ServerSnapshot]) -> list[Finding]:
             desc = _normalize(t.description or "")
             if not desc:
                 continue
-            referenced = sorted(n for n in all_names if n != t.name and _matches(desc, [_normalize(n)]))
+            referenced = sorted(
+                n
+                for n in all_names
+                if n != t.name
+                and len(n) > 4
+                and _normalize(n) not in _GENERIC_NAMES
+                and _matches(desc, [_normalize(n)])
+            )
             if referenced and any(re.search(v, desc) for v in _MANIP_VERBS):
                 findings.append(
                     Finding.from_attack(
