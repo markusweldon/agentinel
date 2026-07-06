@@ -38,6 +38,19 @@ def test_parse_config_handles_stdio_http_and_skips_invalid(tmp_path):
     assert "c" not in specs
 
 
+def test_parse_config_expands_env_vars(tmp_path, monkeypatch):
+    # A server env like {"AUTH": "Bearer ${TOKEN}"} must be expanded before launch, the way a
+    # shell / the host assistant would — otherwise the child gets the literal placeholder.
+    monkeypatch.setenv("AG_TOKEN", "secret-123")
+    cfg = {"mcpServers": {"s": {"command": "srv", "env": {"AUTH": "Bearer ${AG_TOKEN}", "LIT": "plain"}}}}
+    path = tmp_path / "c.json"
+    path.write_text(json.dumps(cfg))
+
+    spec = parse_config(path)[0]
+    assert spec.env["AUTH"] == "Bearer secret-123"
+    assert spec.env["LIT"] == "plain"
+
+
 async def test_fleet_detects_cross_server_trifecta(tmp_path):
     path = _write_fleet_config(
         tmp_path,

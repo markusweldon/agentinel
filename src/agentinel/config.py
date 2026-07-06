@@ -8,6 +8,7 @@ Desktop, and the ``servers`` map used by VS Code. Each entry is either a stdio l
 from __future__ import annotations
 
 import json
+import os
 import shlex
 from pathlib import Path
 from typing import Literal
@@ -42,7 +43,13 @@ def parse_config(path: str | Path) -> list[ServerSpec]:
     for name, entry in servers_map.items():
         if not isinstance(entry, dict):
             continue
-        env = entry.get("env") if isinstance(entry.get("env"), dict) else None
+        raw_env = entry.get("env")
+        # Expand ${VAR}/$VAR the way a shell (and the host assistant) would before launch.
+        env = (
+            {str(k): os.path.expandvars(str(v)) for k, v in raw_env.items()}
+            if isinstance(raw_env, dict)
+            else None
+        )
         url = entry.get("url")
         if url:
             specs.append(ServerSpec(name=name, transport="http", url=str(url), env=env))

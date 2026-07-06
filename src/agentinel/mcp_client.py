@@ -121,8 +121,10 @@ async def connect_stdio(
     parts = shlex_split(command)
     if not parts:
         raise ValueError("empty stdio command")
-    if inherit_env and env is None:
-        env = dict(os.environ)
+    if inherit_env:
+        # Merge declared env OVER the inherited environment so the child keeps PATH/HOME/etc.
+        # (passing only a partial env would strip the process environment and break most servers).
+        env = {**os.environ, **env} if env else dict(os.environ)
 
     devnull = open(os.devnull, "w") if quiet else None
     try:
