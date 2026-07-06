@@ -16,7 +16,15 @@ from ..taxonomy import AttackClass, Severity
 
 
 def _fingerprint(tool: ToolInfo) -> str:
-    blob = (tool.description or "") + "|" + json.dumps(tool.input_schema or {}, sort_keys=True, default=str)
+    # Include annotations: a server can flip readOnlyHint/destructiveHint/openWorldHint (which drive
+    # the A/C classification) with no description or schema change — that is a rug pull we must catch.
+    blob = "|".join(
+        [
+            tool.description or "",
+            json.dumps(tool.input_schema or {}, sort_keys=True, default=str),
+            json.dumps(tool.annotations or {}, sort_keys=True, default=str),
+        ]
+    )
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()
 
 
