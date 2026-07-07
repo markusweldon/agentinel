@@ -10,7 +10,7 @@ from __future__ import annotations
 import asyncio
 import inspect
 import os
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, nullcontext
 from shlex import split as shlex_split
 
 from mcp import ClientSession, StdioServerParameters
@@ -126,14 +126,12 @@ async def connect_stdio(
         # (passing only a partial env would strip the process environment and break most servers).
         env = {**os.environ, **env} if env else dict(os.environ)
 
-    devnull = open(os.devnull, "w") if quiet else None
-    try:
+    # Keep the stderr sink open for the whole session — including the SDK's subprocess teardown on a
+    # timeout — so a child still writing during shutdown can't hit an already-closed pipe.
+    with (open(os.devnull, "w") if quiet else nullcontext()) as devnull:
         async with asyncio.timeout(timeout):
             async with _stdio_session(parts[0], parts[1:], env, devnull) as session:
                 snap = await _enumerate(session, fallback_name=parts[0])
-    finally:
-        if devnull is not None:
-            devnull.close()
     snap.command = command
     return snap
 
