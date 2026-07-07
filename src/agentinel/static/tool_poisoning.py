@@ -1,6 +1,7 @@
 """Tool-poisoning detection: instructions hidden in tool metadata or server instructions.
 
-Scans every tool description, parameter description, and the server-level instructions for:
+Scans every tool description, parameter description, resource/prompt description, and the
+server-level instructions for:
   - invisible / bidi / tag Unicode used to smuggle hidden text,
   - prompt-injection phrasing (instruction overrides, concealment from the user, coerced actions),
   - references to credential files an honest tool description would never mention.
@@ -157,5 +158,15 @@ def check_tool_poisoning(snapshot: ServerSnapshot) -> list[Finding]:
         server_signals = _scan_text(snapshot.instructions, where="server instructions")
         if server_signals:
             findings.append(_finding_from_signals(f"server:{snapshot.server_name}", server_signals))
+
+    # Resources and prompts are enumerated into the snapshot and their text reaches the model too,
+    # so a payload hidden in a resource/prompt description must be caught, not just tool metadata.
+    for kind, items in (("resource", snapshot.resources), ("prompt", snapshot.prompts)):
+        for item in items:
+            name = str(item.get("name", "?"))
+            text = f"{name} {item.get('description', '')}".strip()
+            signals = _scan_text(text, where=f"{kind} '{name}'")
+            if signals:
+                findings.append(_finding_from_signals(f"{kind}:{name}", signals))
 
     return findings
