@@ -128,7 +128,7 @@ async def connect_stdio(
 
     # Keep the stderr sink open for the whole session — including the SDK's subprocess teardown on a
     # timeout — so a child still writing during shutdown can't hit an already-closed pipe.
-    with (open(os.devnull, "w") if quiet else nullcontext()) as devnull:
+    with open(os.devnull, "w") if quiet else nullcontext() as devnull:
         async with asyncio.timeout(timeout):
             async with _stdio_session(parts[0], parts[1:], env, devnull) as session:
                 snap = await _enumerate(session, fallback_name=parts[0])

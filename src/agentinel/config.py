@@ -45,11 +45,7 @@ def parse_config(path: str | Path) -> list[ServerSpec]:
             continue
         raw_env = entry.get("env")
         # Expand ${VAR}/$VAR the way a shell (and the host assistant) would before launch.
-        env = (
-            {str(k): os.path.expandvars(str(v)) for k, v in raw_env.items()}
-            if isinstance(raw_env, dict)
-            else None
-        )
+        env = {str(k): os.path.expandvars(str(v)) for k, v in raw_env.items()} if isinstance(raw_env, dict) else None
         url = entry.get("url")
         if url:
             specs.append(ServerSpec(name=name, transport="http", url=str(url), env=env))

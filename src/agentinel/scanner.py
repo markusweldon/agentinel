@@ -46,9 +46,7 @@ async def scan_config(path: str, *, classifier=None, timeout: float = 30.0, quie
                 assert spec.command is not None  # parse_config guarantees stdio specs carry a command
                 # Scanning your own setup should launch servers the way your assistant does:
                 # inherit the process env, with the config's declared env merged on top.
-                snap = await connect_stdio(
-                    spec.command, env=spec.env, inherit_env=True, timeout=timeout, quiet=quiet
-                )
+                snap = await connect_stdio(spec.command, env=spec.env, inherit_env=True, timeout=timeout, quiet=quiet)
             else:
                 assert spec.url is not None  # ...and http specs carry a url
                 snap = await connect_http(spec.url, timeout=timeout)

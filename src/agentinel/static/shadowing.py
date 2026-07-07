@@ -25,8 +25,25 @@ _MANIP_VERBS = [
 
 # Generic tool names too common to treat as a meaningful cross-reference.
 _GENERIC_NAMES = {
-    "get", "list", "search", "run", "read", "write", "create", "update", "delete",
-    "fetch", "send", "post", "query", "call", "exec", "find", "add", "remove", "echo",
+    "get",
+    "list",
+    "search",
+    "run",
+    "read",
+    "write",
+    "create",
+    "update",
+    "delete",
+    "fetch",
+    "send",
+    "post",
+    "query",
+    "call",
+    "exec",
+    "find",
+    "add",
+    "remove",
+    "echo",
 }
 
 

@@ -1,6 +1,6 @@
 """CLI exit-code contract — what CI gating and the GitHub Action depend on.
 
-  exit 2 = bad usage / connection failure   exit 1 = findings met --fail-on   exit 0 = pass
+exit 2 = bad usage / connection failure   exit 1 = findings met --fail-on   exit 0 = pass
 """
 
 from __future__ import annotations
