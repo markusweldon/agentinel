@@ -139,6 +139,8 @@ That proves the detectors don't regress — but it's Agentinel grading its own h
 
 The GitHub verdict matches a [real-world GitHub MCP exploit disclosed in the wild](https://invariantlabs.ai/blog/mcp-github-vulnerability). Just as important is what Agentinel *doesn't* flag: GitLab (write-focused) is near-trifecta not full, Postgres's read-only `query` isn't called code execution, and fetch/time/memory/Sentry/Drive stay quiet — precision the real-world catalog regression-tests on every commit.
 
+**Zoomed out** — across 35 popular MCP servers (184 tools), ~46% already span two or more trifecta axes and ~11% expose a code-execution surface. Full aggregate and method in [RESEARCH.md](RESEARCH.md) (reproduce with `uv run python scripts/analyze_catalog.py`).
+
 ## CI / GitHub Action
 
 Gate pull requests and upload findings to GitHub code scanning:
