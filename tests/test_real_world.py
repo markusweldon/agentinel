@@ -43,7 +43,7 @@ def test_postgres_readonly_query_not_flagged_as_code_execution():
 
 def test_code_execution_servers_flagged():
     # Puppeteer's evaluate runs arbitrary JavaScript; Kubernetes' kubectl_generic runs any command.
-    for server in ("puppeteer", "kubernetes"):
+    for server in ("puppeteer", "kubernetes", "aws", "e2b"):
         assert any(f.attack_class is AttackClass.UNSAFE_CODE_EXECUTION for f in _findings(server)), server
 
 

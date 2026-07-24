@@ -17,6 +17,8 @@ _CODE_EXEC_TERMS = [
     "subprocess",
     "run command",
     "run code",
+    "cli command",
+    "cli commands",
     "run a command",
     "system command",
     "terminal",

@@ -1,5 +1,5 @@
 {
-  "_note": "Tool definitions copied from the published specs of popular MCP servers (no code is executed). Used to validate agentinel against real-world tool metadata rather than only its own fixtures.",
+  "_note": "Tool definitions copied (and lightly trimmed) from the published specs of popular MCP servers — no code is executed. Some entries are community implementations or archived/deprecated servers; see RESEARCH.md for full provenance and caveats. Used to validate agentinel against real-world tool metadata rather than only its own fixtures.",
   "github": [
     {"name": "issue_read", "description": "Fetch issue details, comments, sub-issues, and labels"},
     {"name": "list_issues", "description": "List issues in a repository with filtering and sorting"},
@@ -112,5 +112,146 @@
     {"name": "create_a_page", "description": "Create a new page under a parent"},
     {"name": "update_page_markdown", "description": "Edit a page's content with Markdown"},
     {"name": "create_a_comment", "description": "Post a new comment on a page"}
+  ],
+  "sqlite": [
+    {"name": "read_query", "description": "Execute a SELECT query on the SQLite database"},
+    {"name": "write_query", "description": "Execute an INSERT, UPDATE, or DELETE query"},
+    {"name": "create_table", "description": "Create a new table in the database"},
+    {"name": "list_tables", "description": "List all tables in the database"},
+    {"name": "describe_table", "description": "View schema information for a table"}
+  ],
+  "redis": [
+    {"name": "set", "description": "Set a Redis string value with an optional expiration"},
+    {"name": "get", "description": "Get a Redis string value"},
+    {"name": "hset", "description": "Set a field in a hash stored at a key"},
+    {"name": "json_set", "description": "Set a JSON value at a path in Redis"},
+    {"name": "dbsize", "description": "Get the number of keys in the database"},
+    {"name": "client_list", "description": "List clients connected to the Redis server"}
+  ],
+  "mongodb": [
+    {"name": "find", "description": "Run a find query against a collection"},
+    {"name": "aggregate", "description": "Run an aggregation pipeline against a collection"},
+    {"name": "insert-many", "description": "Insert multiple documents into a collection"},
+    {"name": "update-many", "description": "Update all documents matching a filter"},
+    {"name": "delete-many", "description": "Delete all documents matching a filter"},
+    {"name": "drop-database", "description": "Remove a database and delete its data files"}
+  ],
+  "elasticsearch": [
+    {"name": "list_indices", "description": "List all available indices"},
+    {"name": "get_mappings", "description": "Get field mappings for an index"},
+    {"name": "search", "description": "Search an index using Query DSL"},
+    {"name": "esql", "description": "Execute an ES|QL query"},
+    {"name": "get_shards", "description": "Get shard information for indices"}
+  ],
+  "docker": [
+    {"name": "list_containers", "description": "List all containers"},
+    {"name": "create_container", "description": "Create a new container"},
+    {"name": "run_container", "description": "Run a container"},
+    {"name": "fetch_container_logs", "description": "Fetch logs from a container"},
+    {"name": "remove_container", "description": "Remove a container"},
+    {"name": "build_image", "description": "Build an image from a Dockerfile"}
+  ],
+  "e2b": [
+    {"name": "run_code", "description": "Run Python code in a secure sandbox using Jupyter Notebook syntax"}
+  ],
+  "grafana": [
+    {"name": "search_dashboards", "description": "Search for dashboards"},
+    {"name": "list_datasources", "description": "List configured datasources"},
+    {"name": "query_prometheus", "description": "Execute a PromQL query against a Prometheus datasource"},
+    {"name": "query_loki_logs", "description": "Query logs from a Loki datasource using LogQL"},
+    {"name": "query_clickhouse", "description": "Execute a SQL query against a ClickHouse datasource"},
+    {"name": "update_dashboard", "description": "Create or update a dashboard"}
+  ],
+  "snowflake": [
+    {"name": "execute_sql", "description": "Execute a SQL query against the connected Snowflake database"},
+    {"name": "cortex_search", "description": "Query a Cortex Search service for unstructured data"},
+    {"name": "cortex_analyst", "description": "Query structured data via a semantic model"}
+  ],
+  "circleci": [
+    {"name": "get_build_failure_logs", "description": "Retrieve failure logs from CircleCI builds"},
+    {"name": "run_pipeline", "description": "Trigger a pipeline to run"},
+    {"name": "rerun_workflow", "description": "Rerun a workflow from the start or a failed job"},
+    {"name": "run_rollback_pipeline", "description": "Trigger a rollback pipeline for a project"},
+    {"name": "get_latest_pipeline_status", "description": "Get the status of the latest pipeline for a branch"},
+    {"name": "list_artifacts", "description": "List artifacts produced by a job"}
+  ],
+  "aws": [
+    {"name": "call_aws", "description": "Execute an AWS CLI command"},
+    {"name": "suggest_aws_commands", "description": "Suggest AWS CLI commands from a natural-language query"}
+  ],
+  "linear": [
+    {"name": "list_issues", "description": "List issues in the workspace"},
+    {"name": "get_issue", "description": "Get details about an issue, including attachments"},
+    {"name": "save_issue", "description": "Create or update an issue"},
+    {"name": "list_comments", "description": "List comments on an issue"},
+    {"name": "save_comment", "description": "Create or update a comment on an issue"},
+    {"name": "create_document", "description": "Create a new document"}
+  ],
+  "jira": [
+    {"name": "getJiraIssue", "description": "Get the details of a Jira issue"},
+    {"name": "searchJiraIssuesUsingJql", "description": "Search issues using JQL"},
+    {"name": "createJiraIssue", "description": "Create a Jira issue"},
+    {"name": "editJiraIssue", "description": "Update a Jira issue"},
+    {"name": "addCommentToJiraIssue", "description": "Add or update a comment on an issue"},
+    {"name": "transitionJiraIssue", "description": "Transition an issue's status"}
+  ],
+  "confluence": [
+    {"name": "getConfluencePage", "description": "Get a Confluence page or blog post, including body content"},
+    {"name": "searchConfluenceUsingCql", "description": "Search Confluence content using CQL"},
+    {"name": "getConfluencePageFooterComments", "description": "Get footer comments on a page"},
+    {"name": "createConfluencePage", "description": "Create a Confluence page or blog post"},
+    {"name": "updateConfluencePage", "description": "Update a Confluence page or blog post"},
+    {"name": "createConfluenceFooterComment", "description": "Create a footer comment on a page"}
+  ],
+  "airtable": [
+    {"name": "list_records", "description": "List records from a table"},
+    {"name": "search_records", "description": "Search for records containing specific text"},
+    {"name": "get_record", "description": "Get a record by ID"},
+    {"name": "create_record", "description": "Create a new record in a table"},
+    {"name": "update_records", "description": "Update one or more records in a table"},
+    {"name": "delete_records", "description": "Delete one or more records from a table"}
+  ],
+  "brave-search": [
+    {"name": "brave_web_search", "description": "Perform a web search with rich results and filtering"},
+    {"name": "brave_local_search", "description": "Search for local businesses and places"},
+    {"name": "brave_image_search", "description": "Search for images"},
+    {"name": "brave_news_search", "description": "Search for current news articles"},
+    {"name": "brave_summarizer", "description": "Generate a summary from web search results"}
+  ],
+  "exa": [
+    {"name": "web_search_exa", "description": "Search the web and return clean content"},
+    {"name": "web_fetch_exa", "description": "Get the full content of a webpage from a URL"},
+    {"name": "web_search_advanced_exa", "description": "Advanced web search with filters and content options"},
+    {"name": "agent_run", "description": "Run an Exa agent for multi-step research"}
+  ],
+  "firecrawl": [
+    {"name": "firecrawl_scrape", "description": "Scrape content from a single URL"},
+    {"name": "firecrawl_search", "description": "Search the web and optionally extract content"},
+    {"name": "firecrawl_map", "description": "Map a website to discover indexed URLs"},
+    {"name": "firecrawl_crawl", "description": "Crawl a website and collect its content"},
+    {"name": "firecrawl_extract", "description": "Extract structured data from web pages"}
+  ],
+  "todoist": [
+    {"name": "find-tasks", "description": "Find tasks by text search, project, labels, or filter"},
+    {"name": "find-tasks-by-date", "description": "Get tasks within a date range"},
+    {"name": "add-tasks", "description": "Add one or more tasks"},
+    {"name": "update-tasks", "description": "Update existing tasks"},
+    {"name": "complete-tasks", "description": "Complete one or more tasks"},
+    {"name": "find-comments", "description": "Find comments on a task or project"}
+  ],
+  "google-maps": [
+    {"name": "maps_geocode", "description": "Convert an address to coordinates"},
+    {"name": "maps_search_places", "description": "Search for places using a text query"},
+    {"name": "maps_place_details", "description": "Get details about a place"},
+    {"name": "maps_directions", "description": "Get directions between points"},
+    {"name": "maps_distance_matrix", "description": "Calculate distances and times between points"}
+  ],
+  "discord": [
+    {"name": "discord_read_messages", "description": "Read messages from a channel"},
+    {"name": "discord_search_messages", "description": "Search messages in a server"},
+    {"name": "discord_send", "description": "Send a message to a channel"},
+    {"name": "discord_edit_message", "description": "Edit a bot-authored message"},
+    {"name": "discord_delete_message", "description": "Delete a message from a channel"},
+    {"name": "discord_add_reaction", "description": "Add a reaction to a message"}
   ]
 }
