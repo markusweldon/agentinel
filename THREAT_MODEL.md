@@ -6,7 +6,7 @@ agentinel assesses the security of an **MCP server and the agent that connects t
 
 - **Untrusted:** everything the server declares — tool names, descriptions, parameter docs, JSON schemas, tool annotations (`readOnlyHint`, etc.), server instructions, and any content returned by a tool. All of it reaches the model and can carry instructions.
 - **Assumption:** the agent is a capable LLM that follows instructions found in tool metadata and tool output unless specifically defended. This is the realistic 2026 baseline.
-- **Out of scope (v1):** network/transport security, server-side RCE in the server's own implementation, and multi-agent (A2A) topologies. agentinel reasons about what the *agent* can be made to do, not the server's internal bugs.
+- **Out of scope (v0.1):** network/transport security, server-side RCE in the server's own implementation, and multi-agent (A2A) topologies. agentinel reasons about what the *agent* can be made to do, not the server's internal bugs.
 
 ## Attack classes → OWASP ASI
 
