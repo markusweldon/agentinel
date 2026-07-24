@@ -26,7 +26,7 @@ Findings map to an OWASP ASI category and export to terminal, JSON, **SARIF** (G
 
 ### What it does well
 - **Turns a known threat model into an automatic check.** No hand-reasoning about your agent's capability surface — you get a ranked report, including the *accidental cross-server* trifecta (individually-safe servers that combine into a real risk).
-- **Validated on 15 real MCP servers.** It correctly flags GitHub's server as a lethal trifecta — the same exploit class disclosed in the wild — and stays quiet on benign ones. That precision is regression-tested on every commit.
+- **Validated on 35 real MCP servers (184 tools).** It correctly flags GitHub's server as a lethal trifecta — the same exploit class disclosed in the wild — and stays quiet on benign ones. That precision is regression-tested on every commit.
 - **Surfaces concrete, fixable risks** in the servers it scans: tool poisoning, leaked secrets, rug-pull drift, and unsafe code-execution surfaces — each mapped to an OWASP ASI category with remediation.
 - **Open and reproducible.** Free to run, read, and extend — the cross-server/fleet view and the adaptive live-server probe are open for anyone to study, reproduce, and build on.
 
@@ -117,7 +117,7 @@ uv run pytest -q -s         # [self-eval] recall=100%  precision=100%  (0 false 
 
 That proves the detectors don't regress — but it's Agentinel grading its own homework. The real test is tool definitions it *didn't* write:
 
-**Real-world catalog.** [`fixtures/real-world/catalog.json`](fixtures/real-world/catalog.json) holds the published tool specs of popular MCP servers (copied from their docs, never executed). Agentinel's verdicts:
+**Real-world catalog.** [`fixtures/real-world/catalog.json`](fixtures/real-world/catalog.json) holds the published tool specs of **35 popular MCP servers** (copied from their docs, never executed). A representative slice of the verdicts (full aggregate in [RESEARCH.md](RESEARCH.md)):
 
 | Server | Axes | Verdict |
 |---|:--:|---|
