@@ -1,7 +1,7 @@
 [project]
 name = "agentinel"
 version = "0.1.0"
-description = "Red-team and statically audit MCP servers and AI agents against the OWASP Agentic Top 10 (2026)."
+description = "Audit MCP servers and agent fleets for the lethal trifecta, tool poisoning, and leaked secrets, mapped to the OWASP Agentic Top 10 (2026)."
 authors = [{ name = "Markus Weldon" }]
 readme = "README.md"
 license = "MIT"
@@ -31,6 +31,12 @@ dependencies = [
     "jinja2>=3.1",
     "truststore>=0.8",
 ]
+
+[project.urls]
+Homepage = "https://github.com/markusweldon/agentinel"
+Repository = "https://github.com/markusweldon/agentinel"
+Issues = "https://github.com/markusweldon/agentinel/issues"
+Changelog = "https://github.com/markusweldon/agentinel/blob/main/CHANGELOG.md"
 
 [project.scripts]
 agentinel = "agentinel.cli:main"
