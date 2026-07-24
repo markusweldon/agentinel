@@ -12,7 +12,7 @@ agentinel assesses the security of an **MCP server and the agent that connects t
 
 | Attack class | What agentinel looks for | Detection | OWASP ASI |
 |---|---|---|---|
-| Tool poisoning | Hidden instructions in tool/param descriptions or server instructions: invisible/bidi Unicode, instruction-override and concealment phrasing, references to credential files | static | ASI01 |
+| Tool poisoning | Hidden instructions in tool/param/resource/prompt descriptions or server instructions: invisible/bidi Unicode, instruction-override and concealment phrasing, references to credential files | static | ASI01 |
 | Prompt injection (live) | Agent steered off-task by an adaptive injection | dynamic probe | ASI01 |
 | Lethal Trifecta / Rule-of-Two | A single tool, or the server's combined toolset, holds untrusted-input **and** sensitive-access **and** external-comms | static | ASI02 |
 | Data exfiltration (live) | Agent induced to leak a planted canary through an external-comms tool | dynamic probe | ASI02 |

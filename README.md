@@ -20,7 +20,7 @@ It builds directly on prior work — Simon Willison's [Lethal Trifecta](https://
 - concrete, fixable issues: **tool poisoning** (hidden instructions in a tool's metadata), **leaked secrets** in config, **rug-pull drift** (a tool's definition changing after you approved it), unsafe code-execution surfaces, over-broad permissions, and cross-server name shadowing;
 - a per-tool **capability matrix** (Rule of Two) so you can see exactly where to break the trifecta.
 
-**`agentinel probe`** is an **experimental** adaptive, "attacker-moves-second" red-team that drives a live agent against a server and tries to exfiltrate a planted canary. *(The loop is unit-tested with a scripted model; it has not yet been validated against a live model — treat its output as a starting point, not proof.)*
+**`agentinel probe`** is an **experimental** adaptive, "attacker-moves-second" red-team that drives a live agent against a server and tries to both hijack its goal and exfiltrate a planted canary. *(The loop is unit-tested with a scripted model; it has not yet been validated against a live model — treat its output as a starting point, not proof.)*
 
 Findings map to an OWASP ASI category and export to terminal, JSON, **SARIF** (GitHub code scanning), and a self-contained **HTML dashboard**.
 

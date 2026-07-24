@@ -10,14 +10,17 @@ First public release: an open-source auditor for MCP servers and agent fleets.
 
 ### Added
 - **`agentinel scan`** — static Rule-of-Two / lethal-trifecta analysis, per-server **and** across a
-  whole fleet, plus tool poisoning, secrets in config, unsafe code-execution surfaces, over-broad
-  permissions, cross-server name shadowing, and rug-pull drift — each mapped to the
+  whole fleet, plus tool poisoning, secrets in config, unsafe code-/CLI-command-execution surfaces,
+  over-broad permissions, cross-server name shadowing, and rug-pull drift — each mapped to the
   OWASP Agentic Top 10 (2026).
-- **`agentinel probe`** — an experimental, adaptive "attacker-moves-second" prompt-injection probe.
-  (Unit-tested with a scripted model; not yet validated against a live model.)
+- **`agentinel probe`** — an experimental, adaptive "attacker-moves-second" prompt-injection probe
+  running both goal-hijack and canary-exfiltration objectives. (Unit-tested with a scripted model;
+  not yet validated against a live model.)
 - Outputs: rich terminal, JSON, **SARIF** (GitHub code scanning), and a self-contained **HTML dashboard**.
 - **`agentinel-mcp`** — a read-only MCP server exposing a single `assess_tools` tool.
-- A GitHub Action, a Pages-hosted demo, and a real-world eval catalog of popular MCP servers.
+- A GitHub Action, a Pages-hosted demo, and a **35-server** real-world eval catalog.
+- A capability-surface study of those 35 servers ([RESEARCH.md](RESEARCH.md)), reproducible via
+  `scripts/analyze_catalog.py`.
 
 ### Fixed (post-audit hardening)
 - Ordinary read + write servers no longer produce a false HIGH lethal-trifecta (write-tool read-gate).
