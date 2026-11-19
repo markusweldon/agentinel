@@ -26,3 +26,18 @@ def test_html_renders_and_escapes_injected_text():
     # autoescape must neutralize injected HTML coming from server-controlled text
     assert "<script>alert(1)</script>" not in html
     assert "&lt;script&gt;" in html
+
+
+def test_html_embeds_brand_fonts_and_shows_a_verdict():
+    target = TargetInfo(transport="stdio", command="x", server_name="s")
+    risky = Report(
+        target=target,
+        tools=[ToolInfo(server="s", name="x", axes=CapabilityAxes(untrusted_input=True))],
+        findings=[Finding.from_attack(AttackClass.TOOL_POISONING, target="s:x", detail="d")],
+    )
+    clean = Report(target=target, tools=[ToolInfo(server="s", name="x", axes=CapabilityAxes())], findings=[])
+
+    risky_html, clean_html = to_html(risky), to_html(clean)
+    assert "@font-face" in risky_html and "data:font/woff2;base64," in risky_html  # self-contained, no network fetch
+    assert "FAIL" in risky_html
+    assert "PASS" in clean_html and "No findings" in clean_html
