@@ -73,14 +73,23 @@ def _render_probe(report: Report, console: Console) -> None:
     )
     if probe.canary:
         console.print(Text(f"planted canary: {probe.canary}", style="dim"))
+    if probe.guard:
+        console.print(
+            Text(f"agent ran under the session guard ({probe.guard} tracking); every prompt declined", style="dim")
+        )
     table = Table(box=SIMPLE_HEAVY)
     table.add_column("OWASP")
     table.add_column("Objective", overflow="fold")
     table.add_column("Result")
     table.add_column("Rounds", justify="right")
+    if probe.guard:
+        table.add_column("Guard prompts", justify="right")
     for a in probe.attempts:
         result = Text("BREACHED", style="bold red") if a.succeeded else Text("withstood", style="green")
-        table.add_row(a.asi.value, a.objective, result, str(a.rounds))
+        row = [a.asi.value, a.objective, result, str(a.rounds)]
+        if probe.guard:
+            row.append(str(a.guard_prompts))
+        table.add_row(*row)
     console.print(table)
 
 

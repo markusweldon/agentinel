@@ -135,6 +135,7 @@ class ProbeAttempt(BaseModel):
     rounds: int = 1
     judge_rationale: str | None = None
     transcript: list[dict] = Field(default_factory=list)
+    guard_prompts: int = 0  # calls the session guard stopped for approval (when the guard was on)
 
 
 class ProbeReport(BaseModel):
@@ -142,6 +143,7 @@ class ProbeReport(BaseModel):
 
     attempts: list[ProbeAttempt] = Field(default_factory=list)
     canary: str | None = None
+    guard: str | None = None  # session guard tracking mode the agent ran under, if any
 
     @property
     def succeeded(self) -> list[ProbeAttempt]:

@@ -26,9 +26,10 @@ def to_anthropic_tools(tools: list[ToolInfo]) -> list[dict]:
 
 @dataclass
 class AgentRun:
-    tool_calls: list[ToolCall] = field(default_factory=list)
+    tool_calls: list[ToolCall] = field(default_factory=list)  # calls that ran (were not blocked)
     final_text: str = ""
     steps: int = 0
+    blocked: list[ToolCall] = field(default_factory=list)  # calls a gate stopped before they ran
 
 
 def run_agent(
@@ -39,10 +40,16 @@ def run_agent(
     tools: list[dict],
     tool_result_fn: Callable[[ToolCall], str],
     max_steps: int = 4,
+    gate: Callable[[ToolCall], str | None] | None = None,
 ) -> AgentRun:
-    """Run the agent loop until it stops calling tools or ``max_steps`` is reached."""
+    """Run the agent loop until it stops calling tools or ``max_steps`` is reached.
+
+    ``gate`` (optional) sees each call before it "runs". Returning a string blocks the call and
+    sends that string back to the agent as the tool result, the way a declined approval would.
+    """
     messages: list[dict] = [{"role": "user", "content": user_content}]
     all_calls: list[ToolCall] = []
+    blocked: list[ToolCall] = []
     final_text = ""
     steps = 0
 
@@ -53,11 +60,17 @@ def run_agent(
             final_text = resp.text
         if not resp.tool_calls:
             break
-        all_calls.extend(resp.tool_calls)
         messages.append({"role": "assistant", "content": resp.raw_content or [{"type": "text", "text": resp.text}]})
-        results = [
-            {"type": "tool_result", "tool_use_id": call.id, "content": tool_result_fn(call)} for call in resp.tool_calls
-        ]
+        results = []
+        for call in resp.tool_calls:
+            stop = gate(call) if gate else None
+            if stop is not None:
+                blocked.append(call)
+                content = stop
+            else:
+                all_calls.append(call)
+                content = tool_result_fn(call)
+            results.append({"type": "tool_result", "tool_use_id": call.id, "content": content})
         messages.append({"role": "user", "content": results})
 
-    return AgentRun(tool_calls=all_calls, final_text=final_text, steps=steps)
+    return AgentRun(tool_calls=all_calls, final_text=final_text, steps=steps, blocked=blocked)

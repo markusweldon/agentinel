@@ -41,6 +41,7 @@ Changelog = "https://github.com/markusweldon/agentinel/blob/main/CHANGELOG.md"
 [project.scripts]
 agentinel = "agentinel.cli:main"
 agentinel-mcp = "agentinel.server:main"
+agentinel-guard = "agentinel.guard.hook:main"
 
 [dependency-groups]
 dev = [
