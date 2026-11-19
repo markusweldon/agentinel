@@ -53,3 +53,13 @@ Capability classification (the A/B/C axes) lives in `static/classifier.py`. Pref
 ## PRs
 
 Small, focused PRs with tests. Describe what you changed and why; if you fixed a detector, mention the real server/case that exposed it.
+
+## Releasing
+
+Releases go to [PyPI](https://pypi.org/project/agentinel/) through trusted publishing, so no API
+token is stored anywhere.
+
+1. Bump `__version__` in `src/agentinel/__init__.py` and add a section to `CHANGELOG.md`.
+2. Merge to `main`.
+3. Publish a GitHub release tagged `vX.Y.Z` (matching `__version__`). The **Release** workflow
+   builds the package, checks it, and uploads it.

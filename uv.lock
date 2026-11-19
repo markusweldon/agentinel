@@ -12,7 +12,6 @@ resolution-markers = [
 
 [[package]]
 name = "agentinel"
-version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "anthropic" },
@@ -36,7 +35,7 @@ dev = [
 requires-dist = [
     { name = "anthropic", specifier = ">=0.40" },
     { name = "jinja2", specifier = ">=3.1" },
-    { name = "mcp", specifier = ">=1.20" },
+    { name = "mcp", specifier = ">=1.20,<2" },
     { name = "pydantic", specifier = ">=2.7" },
     { name = "rich", specifier = ">=13.7" },
     { name = "truststore", specifier = ">=0.8" },

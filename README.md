@@ -11,6 +11,7 @@
 > **A sentinel for your AI agents.** Statically audit MCP servers and agent fleets for the **lethal trifecta**, tool poisoning, and leaked secrets — with findings mapped to the **OWASP Agentic Top 10 (2026)**. Plus an experimental adaptive red-team probe.
 
 [![CI](https://github.com/markusweldon/agentinel/actions/workflows/ci.yml/badge.svg)](https://github.com/markusweldon/agentinel/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/agentinel.svg)](https://pypi.org/project/agentinel/)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![OWASP Agentic Top 10](https://img.shields.io/badge/OWASP-Agentic%20Top%2010%3A2026-red)](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/)
@@ -74,11 +75,15 @@ Add `--html report.html` for the dashboard pictured at the top of this README, o
 
 ## Scan your own setup
 
+```bash
+pip install agentinel        # or: uv tool install agentinel
+```
+
 Point `--config` at the MCP config your assistant already uses — Agentinel reads it, connects to every server you have installed, and analyzes their real tools as a fleet:
 
 ```bash
-uv run agentinel scan --config ~/.cursor/mcp.json --html report.html
-uv run agentinel scan --config "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
+agentinel scan --config ~/.cursor/mcp.json --html report.html
+agentinel scan --config "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
 ```
 
 **Read-only by design.** A scan asks each server only for its capability list (`initialize` → `list_tools` / `list_resources` / `list_prompts`). It **never calls a tool** — there is no `call_tool` anywhere in the codebase — so nothing is sent, written, deleted, or executed. It reads tool *metadata* and analyzes text. (Starting a server to read its list runs that server's own startup, exactly as your assistant does every launch.)
@@ -178,7 +183,7 @@ Method, results, what went wrong and the known gaps: [docs/guard.md](docs/guard.
 Agentinel also ships as an MCP server, so an assistant can audit tool definitions on demand:
 
 ```bash
-claude mcp add agentinel -- uv run agentinel-mcp
+claude mcp add agentinel -- uvx --from agentinel agentinel-mcp
 ```
 
 It exposes one read-only tool, `assess_tools`, that analyzes tool metadata you pass it — it never launches or connects to anything (that footgun is exactly what Agentinel flags). Live scanning stays in the CLI, where a human supplies the target.
