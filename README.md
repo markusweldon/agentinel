@@ -4,6 +4,8 @@
 
 </div>
 
+<br>
+
 <img alt="Agentinel scanning GitHub's MCP server. Five of its tools on the three lethal-trifecta axes: list_issues reads untrusted input (A); get_file_contents and get_secret_scanning_alert read sensitive data (B); push_files reads sensitive data and takes an external action (B and C); create_pull_request reads untrusted input and takes an external action (A and C). The finding: HIGH, lethal trifecta, it reads untrusted issues and PRs, reads private repo data, and can push and merge. ASI02 Tool Misuse, the same exploit class disclosed in the real GitHub MCP attack. The scan is static and read-only and never calls a tool." src="docs/assets/hero.svg" width="100%">
 
 > **A sentinel for your AI agents.** Statically audit MCP servers and agent fleets for the **lethal trifecta**, tool poisoning, and leaked secrets — with findings mapped to the **OWASP Agentic Top 10 (2026)**. Plus an experimental adaptive red-team probe.
