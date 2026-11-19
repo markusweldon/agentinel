@@ -128,6 +128,12 @@ def probe(
     ),
     timeout: float = typer.Option(30.0, "--timeout", help="Connection timeout in seconds."),
     quiet: bool = typer.Option(True, "--quiet/--no-quiet", help="Suppress the probed server's stderr."),
+    guard: str = typer.Option(
+        None,
+        "--guard",
+        help="Run the agent under the session guard ('flow' or 'session'), declining every prompt. "
+        "Compare with a run without it.",
+    ),
 ) -> None:
     """Adaptively red-team a live MCP server. Requires ANTHROPIC_API_KEY.
 
@@ -135,6 +141,9 @@ def probe(
     """
     if bool(stdio) == bool(http):
         err.print("[red]Provide exactly one of --stdio '<command>' or --http <url>.[/red]")
+        raise typer.Exit(2)
+    if guard not in (None, "flow", "session"):
+        err.print("[red]--guard must be 'flow' or 'session'.[/red]")
         raise typer.Exit(2)
     if not os.environ.get("ANTHROPIC_API_KEY"):
         err.print("[red]ANTHROPIC_API_KEY is not set — the probe needs it to drive the models.[/red]")
@@ -151,6 +160,7 @@ def probe(
                     timeout=timeout,
                     quiet=quiet,
                     include_static=not no_static,
+                    guard=guard,
                 )
             )
         else:
@@ -162,6 +172,7 @@ def probe(
                     attacker_model=attacker_model,
                     timeout=timeout,
                     include_static=not no_static,
+                    guard=guard,
                 )
             )
     except Exception as exc:  # noqa: BLE001
@@ -171,6 +182,106 @@ def probe(
     render_report(report, fail_on=fail_on)
     _write_outputs(report, json_out, sarif_out, html_out)
     raise typer.Exit(0 if report.gate(fail_on) else 1)
+
+
+guard_app = typer.Typer(
+    no_args_is_help=True,
+    help="Session-aware Rule of Two guard for Claude Code: ask only when a call could leak data.",
+)
+app.add_typer(guard_app, name="guard")
+
+_HOOK_SETTINGS = {
+    "hooks": {
+        event: [{"matcher": "*", "hooks": [{"type": "command", "command": "agentinel-guard"}]}]
+        for event in ("PreToolUse", "PostToolUse")
+    }
+}
+
+
+@guard_app.command("init")
+def guard_init(
+    config: Path = typer.Option(None, "--config", help="Scan the MCP servers in this config (launches them)."),
+    report_path: Path = typer.Option(None, "--report", help="Build from a saved `agentinel scan --json` report."),
+    out: Path = typer.Option(Path(".agentinel/guard-policy.json"), "--out", help="Where to write the policy."),
+    timeout: float = typer.Option(30.0, "--timeout", help="Connection timeout in seconds (with --config)."),
+) -> None:
+    """Write a guard policy (MCP tool -> A/B/C legs) from a scan of your MCP servers."""
+    from .guard.policy import load_report, policy_from_report
+
+    if sum(bool(x) for x in (config, report_path)) != 1:
+        err.print("[red]Provide exactly one of --config <path> or --report <scan.json>.[/red]")
+        raise typer.Exit(2)
+    try:
+        report = load_report(report_path) if report_path else asyncio.run(scan_config(str(config), timeout=timeout))
+    except Exception as exc:  # noqa: BLE001
+        err.print(f"[red]Could not build the policy:[/red] {exc}")
+        raise typer.Exit(2) from exc
+    policy = policy_from_report(report)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(policy, indent=2) + "\n")
+    for note in report.notes:
+        err.print(f"[yellow]{note}[/yellow]")
+    err.print(f"wrote {len(policy['tools'])} tool(s) -> {out}")
+
+
+@guard_app.command("install")
+def guard_install() -> None:
+    """Print the Claude Code hook settings to add (nothing is written for you)."""
+    err.print(
+        "Add this to .claude/settings.json (this project) or ~/.claude/settings.json (everywhere).\n"
+        "The guard only ever adds an approval prompt; it never grants a permission.\n"
+    )
+    typer.echo(json.dumps(_HOOK_SETTINGS, indent=2))
+
+
+@guard_app.command("replay")
+def guard_replay(
+    paths: list[Path] = typer.Argument(None, help="Transcript .jsonl files (default: ~/.claude/projects)."),
+    policy_path: Path = typer.Option(None, "--policy", help="A guard policy for your MCP tools."),
+    json_out: Path = typer.Option(None, "--json", help="Write the counts as JSON to this path."),
+) -> None:
+    """Measure what the guard would have cost on your recorded Claude Code sessions (local only)."""
+    from rich.table import Table
+
+    from .guard.claude_code import load_policy
+    from .guard.replay import default_transcripts, replay
+
+    if policy_path:
+        os.environ["AGENTINEL_GUARD_POLICY"] = str(policy_path)
+    files = list(paths) if paths else default_transcripts()
+    if not files:
+        err.print("[red]No transcripts found.[/red] Pass .jsonl files, or run Claude Code first.")
+        raise typer.Exit(2)
+    stats = replay(files, load_policy(os.getcwd()))
+
+    def pct(n: int) -> str:
+        return f"{n / stats.external_calls:.0%}" if stats.external_calls else "-"
+
+    table = Table(title=f"Guard replay: {stats.sessions} sessions, {stats.tool_calls} tool calls", title_justify="left")
+    table.add_column("Policy")
+    table.add_column("Approval prompts", justify="right")
+    table.add_column("vs. baseline", justify="right")
+    table.add_row("Ask before every external action (baseline)", str(stats.external_calls), "100%")
+    table.add_row("Guard, session-wide tracking", str(stats.session_prompts), pct(stats.session_prompts))
+    table.add_row("Guard, value-level flow tracking (default)", str(stats.prompts), pct(stats.prompts))
+    Console().print(table)
+    err.print(
+        f"{stats.sessions_with_ab} of {stats.sessions} sessions held both untrusted input and sensitive data; "
+        f"{stats.sessions_prompted} would have seen a prompt."
+    )
+    if stats.prompt_tools:
+        err.print("prompts by tool: " + ", ".join(f"{k} {v}" for k, v in stats.prompt_tools.most_common()))
+    if json_out:
+        json_out.write_text(json.dumps(stats.to_json(), indent=2))
+        err.print(f"[dim]wrote JSON -> {json_out}[/dim]")
+
+
+@guard_app.command("hook")
+def guard_hook() -> None:
+    """The hook itself (reads one event on stdin). Prefer the faster `agentinel-guard` entry point."""
+    from .guard.hook import main as hook_main
+
+    raise typer.Exit(hook_main())
 
 
 @app.command()

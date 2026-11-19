@@ -160,6 +160,19 @@ Gate pull requests and upload findings to GitHub code scanning:
 
 `agentinel scan` exits non-zero when a finding meets `--fail-on`, and `--sarif` output lands in the Security tab.
 
+## Session guard (research prototype)
+
+Almost every useful agent holds the lethal trifecta, so "remove a leg" isn't advice anyone takes. The guard tests a different approach: a Claude Code hook that stays silent unless an outbound call is **carrying data the session read from a sensitive source**, after the session has also read untrusted input. It never grants a permission; it can only add a prompt.
+
+On a first replay of real Claude Code sessions it asked **2 times in 88 outbound calls**, against 88 for asking before every outbound call. Asking for the whole session after any secret was touched still cost 83. The adaptive probe can now run with the guard on, to measure what gets through.
+
+```bash
+agentinel guard replay      # what would it cost on your own sessions? (local only)
+agentinel guard install     # prints the hook settings to add
+```
+
+Method, results, what went wrong and the known gaps: [docs/guard.md](docs/guard.md).
+
 ## Run it from inside your assistant
 
 Agentinel also ships as an MCP server, so an assistant can audit tool definitions on demand:

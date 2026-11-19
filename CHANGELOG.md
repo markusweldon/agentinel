@@ -4,6 +4,14 @@ All notable changes to Agentinel are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/), and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- **`agentinel guard`** (research prototype) — a session-aware Rule-of-Two hook for Claude Code
+  that asks only when an outbound call carries data read from a sensitive source after untrusted
+  input. `guard init` builds a policy from a scan, `guard replay` measures the prompt cost on your
+  recorded sessions, and `probe --guard` measures what still leaks. See `docs/guard.md`.
+
 ## [0.1.0] — unreleased
 
 First public release: an open-source auditor for MCP servers and agent fleets.

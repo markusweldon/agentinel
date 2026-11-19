@@ -45,6 +45,7 @@ async def probe_stdio(
     include_static: bool = True,
     agent_chat: Chat | None = None,
     attacker_chat: Chat | None = None,
+    guard: str | None = None,
 ) -> Report:
     snap = await connect_stdio(command, quiet=quiet, timeout=timeout)
     classify_snapshot(snap)
@@ -53,6 +54,7 @@ async def probe_stdio(
         attacker_chat=attacker_chat or AnthropicChat(attacker_model),
         tools=snap.tools,
         rounds=rounds,
+        guard=guard,
     )
     target = TargetInfo(transport="stdio", command=command, server_name=snap.server_name)
     return _assemble(snap, target, probe, include_static)
@@ -68,6 +70,7 @@ async def probe_http(
     include_static: bool = True,
     agent_chat: Chat | None = None,
     attacker_chat: Chat | None = None,
+    guard: str | None = None,
 ) -> Report:
     snap = await connect_http(url, timeout=timeout)
     classify_snapshot(snap)
@@ -76,6 +79,7 @@ async def probe_http(
         attacker_chat=attacker_chat or AnthropicChat(attacker_model),
         tools=snap.tools,
         rounds=rounds,
+        guard=guard,
     )
     target = TargetInfo(transport="http", url=url, server_name=snap.server_name)
     return _assemble(snap, target, probe, include_static)
