@@ -1,9 +1,8 @@
 [project]
 name = "agentinel"
-version = "0.1.0"
+dynamic = ["version", "readme"]
 description = "Audit MCP servers and agent fleets for the lethal trifecta, tool poisoning, and leaked secrets, mapped to the OWASP Agentic Top 10 (2026)."
 authors = [{ name = "Markus Weldon" }]
-readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
 keywords = [
@@ -18,12 +17,19 @@ keywords = [
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
+    "Environment :: Console",
     "Intended Audience :: Developers",
-    "Topic :: Security",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
 ]
 dependencies = [
-    "mcp>=1.20",
+    "mcp>=1.20,<2",
     "pydantic>=2.7",
     "typer>=0.12",
     "rich>=13.7",
@@ -52,11 +58,36 @@ dev = [
 ]
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.25", "hatch-fancy-pypi-readme>=24.1"]
 build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/agentinel/__init__.py"
+
+# PyPI can't resolve the README's relative links, so point images at raw files and links at GitHub.
+[tool.hatch.metadata.hooks.fancy-pypi-readme]
+content-type = "text/markdown"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+path = "README.md"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = 'src="(?!https?://)([^"]+)"'
+replacement = 'src="https://raw.githubusercontent.com/markusweldon/agentinel/main/\1"'
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = 'href="(?!https?://|#)([^"]+)"'
+replacement = 'href="https://github.com/markusweldon/agentinel/blob/main/\1"'
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = '\]\((?!https?://|#)([^)]+)\)'
+replacement = '](https://github.com/markusweldon/agentinel/blob/main/\1)'
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/agentinel"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/src/agentinel", "/tests", "/fixtures", "/README.md", "/LICENSE", "/CHANGELOG.md"]
 
 [tool.ruff]
 line-length = 120
