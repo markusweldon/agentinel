@@ -1,0 +1,66 @@
+{
+  "target": {
+    "transport": "stdio",
+    "command": "python fixtures/clean/fetch_only_server.py",
+    "url": null,
+    "server_name": "docs-fetcher"
+  },
+  "tools": [
+    {
+      "server": "docs-fetcher",
+      "name": "fetch_doc",
+      "description": "Fetch a public documentation page by URL and return its text.",
+      "input_schema": {
+        "properties": {
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "fetch_docArguments",
+        "type": "object"
+      },
+      "annotations": null,
+      "axes": {
+        "untrusted_input": true,
+        "sensitive_access": false,
+        "external_comms": false,
+        "rationale": {
+          "A": "matched: fetch"
+        }
+      }
+    },
+    {
+      "server": "docs-fetcher",
+      "name": "search_docs",
+      "description": "Look up a topic in the public documentation index.",
+      "input_schema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "search_docsArguments",
+        "type": "object"
+      },
+      "annotations": null,
+      "axes": {
+        "untrusted_input": false,
+        "sensitive_access": false,
+        "external_comms": false,
+        "rationale": {}
+      }
+    }
+  ],
+  "findings": [],
+  "probe": null,
+  "generated_at": "2026-06-19 03:57 UTC",
+  "notes": []
+}
