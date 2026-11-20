@@ -17,6 +17,8 @@ approve everything soon approve without reading. The question this prototype tes
 **Can a guard stay silent almost all the time, and ask only at the moment data could actually
 leak?**
 
+<img alt="The guard following one Claude Code session: it records a fetched page as untrusted input and fingerprints .env, lets git push through, and asks only when a curl call carries a value read from .env." src="assets/guard.svg" width="100%">
+
 ## How it works
 
 A Claude Code hook (`agentinel-guard`) on `PreToolUse` and `PostToolUse`:
@@ -51,6 +53,8 @@ work, so a small, unrepresentative sample):
 | Ask before every external action (baseline) | 88 | 100% |
 | Guard, session-wide tracking | 83 | 94% |
 | **Guard, value-level flow tracking** | **2** | **2%** |
+
+<img alt="Approval prompts on six recorded sessions: 88 asking before every external action, 83 with session-wide tracking, 2 with value-level flow tracking." src="assets/guard-numbers.svg" width="100%">
 
 Both remaining prompts were single shell commands that touched a credential *and* reached out in
 the same call, where the guard can't see what passes between the two. That's the intended

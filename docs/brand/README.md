@@ -1,6 +1,6 @@
 # Agentinel brand
 
-The README logo, hero, trifecta diagram and social preview are generated from one script, so they stay consistent.
+The README logo, hero, trifecta diagram, the two session-guard images and the social preview are generated from one script, so they stay consistent.
 
 ```bash
 uv run --with fonttools --with brotli python docs/brand/build.py          # SVGs in docs/assets/
