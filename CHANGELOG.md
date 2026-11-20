@@ -4,6 +4,16 @@ All notable changes to Agentinel are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/), and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.1.1] — 2026-11-19
+
+Docs only, so PyPI shows the current README. No code changes.
+
+### Changed
+- The README and `docs/guard.md` show two new session-guard images: one Claude Code session where the
+  guard stays quiet until a call carries a value read from `.env`, and the replay result (88 approval
+  prompts down to 2).
+- The README intro mentions the guard and `pip install agentinel`.
+
 ## [0.1.0] — 2026-11-19
 
 First public release, and the first on PyPI (`pip install agentinel`): an open-source auditor for
@@ -37,4 +47,5 @@ MCP servers and agent fleets.
   declare an API key launch correctly.
 - Shadowing no longer false-fires on "When the user…" plus generic tool names.
 
-[0.1.0]: https://github.com/markusweldon/agentinel
+[0.1.1]: https://github.com/markusweldon/agentinel/releases/tag/v0.1.1
+[0.1.0]: https://github.com/markusweldon/agentinel/releases/tag/v0.1.0
